@@ -1,5 +1,5 @@
 ## Normal density
-f = function(m = rep(0, 2), sigma = diag(2), bounds = c(+Inf, +Inf), sum_elem = 10L) {
+f = function(m = rep(0, 2), sigma = diag(2), bounds = c(-Inf, +Inf), sum_elem = 10L) {
   dim = length(m)
   if(dim == 1L) {
     dcurrent = dnorm
@@ -11,28 +11,7 @@ f = function(m = rep(0, 2), sigma = diag(2), bounds = c(+Inf, +Inf), sum_elem = 
 
 ## Derivative of the Normal density
 Df = function(m = rep(0, 2), sigma = diag(2), bounds = c(+Inf, +Inf), sum_elem = 10L) {
-  dim = length(m)
-  if(dim == 1L) {
-    dcurrent = deriv_dnorm
-  } else {
-    dcurrent = deriv_dmvnorm
-  }
-  return(get_f_out(dcurrent, m, sigma, bounds, sum_elem))
-}
-
-## Helper 1: Derivative of the normal density w.r.t. x in dimension 1
-deriv_dnorm = function(x, m, sigma) { # sigma = sd
-  dcurrent = dnorm
-  out = - dcurrent(x, m, sigma) * (sigma^(-2) * (x - m))
-  return(out)
-}
-
-## Helper 2: Derivative of the normal density w.r.t. x in dimension > 1
-deriv_dmvnorm = function(x, m, sigma) { # sigma = matrix of variance-covariance
-  dcurrent = dmvnorm
-  # Matrix cookbook 8.1.1
-  out = - dcurrent(x, m, sigma) * (solve(sigma) %*% (x - m))
-  return(out)
+  return(get_f_out(deriv_dnorm, m, sigma, bounds, sum_elem))
 }
 
 ## Helper 3: Computing the density in x as the sum in all bounded directions
@@ -42,9 +21,7 @@ get_f_out = function(dcurrent, m, sigma, bounds, sum_elem) {
       stop("x and m must have same dimensions")
     }
     xmod = where_evaluate(x, bounds, sum_elem)
-    # out = sapply(xmod, function(x) {dcurrent(x, m, sigma)})
     out = apply(xmod, 1, function(x) {dcurrent(x, m, sigma)})
-    #print(out)
     if(is.null(dim(out)[1])) { # 1D
       return(sum(out))
     } else { # 2D or more
