@@ -1,76 +1,48 @@
 rm(list = ls())
 library(mvtnorm)
 library(abind)
-source("helpers/helpers.R")
 source("helpers/1_density.R")
-source("helpers/2_particle.R")
-source("helpers/3_universe.R")
+source("helpers/2_dynamic.R")
+source("helpers/3_plot.R")
 
+particles = list(c(0,0,0), c(0,0,1), c(1,0,0), c(2,0,1))
+types = list(c(1,1,-1), c(1,1,1), c(-1,-1,1), c(1,1,-1))
+n = 1000
+alpha = 1
+bound = +Inf
+sum_elem = 3L
+arrayout = push_n(particles, types, n, alpha, Df, bound, sum_elem)
+plot(delta_n(arrayout), ylim = c(0, range(delta_n(arrayout))[2]))
+plot(arrayout[1,1,])
+plot(arrayout[3,2,])
 
-new("Particle")
-m = list(c(1,2), c(3,4), c(5,6))
-sigma = list(diag(2), diag(2), diag(2))
-type = list(c(-1,1), c(1,1), c(1,-1))
-bounds = c(+Inf, +Inf)
-sum_elem = 0L
-u = new("Universe", m, sigma, type, bounds, sum_elem)
+############################
+# Two-dimensional plotting #
+############################
+particles = list(c(0,0), c(0,1), c(1,0), c(2,1))
+types = list(c(1,-1), c(1,1), c(-1,1), c(1,-1))
+n = 1000
+alpha = 1
+bound = +Inf
+sum_elem = 3L
+arrayout = push_n(particles, types, n, alpha, Df, bound, sum_elem)
+plot(delta_n(arrayout), ylim = c(0, range(delta_n(arrayout))[2]))
 
-u@f(c(1,2),diag(2))(c(0,0))
-u@Df(c(1,2),diag(2))(c(0,0))
+idx_particle = 1
+plot(arrayout[1,idx_particle,], arrayout[2,idx_particle,])
+lines(arrayout[1,2,], arrayout[2,2,])
 
-get_m(u)
-mix(u)(c(0,0))
-# methods: proportion of type=+1 etc.
+df = as.data.frame.table(arrayout, base = list(paste0("dim", 1:dim(arrayout)[1]),
+                                          paste0("part", 1:dim(arrayout)[2]),
+                                          as.character(1:dim(arrayout)[3])))
+df[,3] = as.numeric(df[,3])
 
-# evolution is t particules position at each step
-# particle is the complete particles at the current step
-# dim = ...     type can be (+,+,-) in dim 3!!!! Yes
+plot()
+# En vue de dessus, trajectoire de chaque particule (tous les x pas)
 
-
-
-
-
-
-
-
-
-## Manifold parameters
-bounds = c(2*pi, NA)
-sum_elem = 10L
-
-## Particle parameters
-m = list(c(0,0)) # runif(n, -length_circle/2, length_circle/2) #c(-1, 0, 1)
-sigma = diag(2)
-type = +1 # 2*(rbinom(n, 1, 0.5) - 0.5) # c(+1, +1, -1) # rep(-1, n)
-
-## Evolution parameters
-alpha = 0.1
-
-
-push(m, type, alpha, Df, sigma, bounds, sum_elem)
-push(0.2, type, alpha, Df, sigma, bounds, sum_elem)
+############################
+# One-dimensional plotting #
+############################
 
 
 
-########
-# Code #
-########
-nsteps = 10
-every = 1
-x = seq(from = -length_circle/2, to = length_circle/2, length.out = 1000)
-m_all = matrix(NA, ncol = length(m), nrow = nsteps)
-m_all[1, ] = m
-for(step in 2:nsteps) {
-  m_all[step, ] = push(m_all[step-1, ], type, sigma, alpha, Df)
-  
-  if(step %% every == 0) {
-    dir.create("plot", showWarnings = FALSE)
-    png(paste0("plot/", step, ".png"))
-    plotting(x, m_all[step, ], type, sigma(step), f, Df, with_deriv = FALSE, main = step)
-    dev.off()
-  }
-}
-
-# plot(m_all[,1], type = "l", ylim = range(m_all))
-# lines(m_all[,2], type = "l", col = "blue")
-sum(type == 1)
