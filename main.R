@@ -1,5 +1,6 @@
 rm(list = ls())
 library(mvtnorm)
+library(RUnit)
 source("helpers/helpers.R")
 source("helpers/1_density.R")
 source("helpers/2_particle.R")
