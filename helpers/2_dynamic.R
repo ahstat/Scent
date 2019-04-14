@@ -80,6 +80,9 @@ push_n = function(particles = list(c(0,0,0), c(0,0,1), c(1,0,0), c(2,0,1)),
   arrayout = init
 
   for(k in 1:(n-1)) {
+    if(k %% 10 == 0) {
+      print(k)
+    }
     current = arrayout[,,dim(arrayout)[3]]
     current = lapply(1:ncol(current), function(col){current[, col]})
     to_append = push(current, types, alpha, Df, bound, sum_elem)
