@@ -51,7 +51,63 @@ push = function(particles, types, alpha = 0.1, Df, bound = +Inf, sum_elem = 3L) 
   return(out)
 }
 
-particles = list(c(0,0,0), c(0,0,1), c(1,0,0), c(2,0,1))
-types = list(c(1,1,-1), c(1,1,1), c(-1,-1,1), c(1,1,-1))
-push(particles, types, alpha = 0.1, Df, bound = +Inf, sum_elem = 3L)
+## Example
+# particles = list(c(0,0,0), c(0,0,1), c(1,0,0), c(2,0,1))
+# types = list(c(1,1,-1), c(1,1,1), c(-1,-1,1), c(1,1,-1))
+# particles2 = push(particles, types, alpha = 0.1, Df, bound = +Inf, sum_elem = 3L)
+
+##############################################################
+# Measure distance between two consecutive sets of particles #
+##############################################################
+delta_push = function(particles, particles2) {
+  p1 = sapply(particles, c)
+  p2 = sapply(particles2, c)
+  sqrt(mean((p1 - p2)^2))
+}
+
+## Example
+# delta_push(particles, particles2)
+
+#################################################
+# Pushing n steps and converting to 3 dim array #
+#################################################
+push_n = function(particles = list(c(0,0,0), c(0,0,1), c(1,0,0), c(2,0,1)), 
+                  types = list(c(1,1,-1), c(1,1,1), c(-1,-1,1), c(1,1,-1)),
+                  n = 100,
+                  alpha = 0.1, Df, bound = +Inf, sum_elem = 3L) {
+  init = array(sapply(particles, c), 
+               dim = c(length(particles[[1]]), length(particles), 1))
+  arrayout = init
+
+  for(k in 1:(n-1)) {
+    current = arrayout[,,dim(arrayout)[3]]
+    current = lapply(1:ncol(current), function(col){current[, col]})
+    to_append = push(current, types, alpha, Df, bound, sum_elem)
+
+    to_append = sapply(to_append, c)
+    arrayout = abind(arrayout, to_append, along=3)
+  }
+  return(arrayout)
+}
+
+delta_n = function(arrayout) {
+  n = dim(arrayout)[3]
+  delta = rep(NA, n-1)
+  for(i in 2:n) {
+    a1 = arrayout[,,i]
+    a2 = arrayout[,,i-1]
+    delta[i-1] = sqrt(mean((a1 - a2)^2))
+  }
+  return(delta)
+}
+
+## Example
+# particles = list(c(0,0,0), c(0,0,1), c(1,0,0), c(2,0,1))
+# types = list(c(1,1,-1), c(1,1,1), c(-1,-1,1), c(1,1,-1))
+# n = 100
+# alpha = 0.1
+# bound = +Inf
+# sum_elem = 3L
+# arrayout = push_n(particles, types, n, alpha, Df, bound, sum_elem) 
+# plot(delta_n(arrayout))
 
