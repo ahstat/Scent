@@ -8,13 +8,24 @@
 # Sigma: matrix of variance-covariance (variance in dimension one)
 ##
 
-deriv_dnorm = function(x, m, Sigma) {
-  # Matrix cookbook 8.1.1
-  out = - dmvnorm(x, m, Sigma) * (solve(Sigma) %*% (x - m))
+deriv_dnorm = function(x, m) {
+  out = - (1 / (2*pi)^(length(m)/2)) * exp(-sum((x-m)^2)/2) * (x - m)
   return(out)
+  
+  # # With general Sigma, for reference
+  # # Matrix cookbook 8.1.1
+  # Sigma = diag(length(m))
+  # out = - dmvnorm(x, m, Sigma) * (solve(Sigma) %*% (x - m))
+  # return(out)
+  
   # In dimension 1, for reference:
   # variance = Sigma[1,1]
   # out = - dnorm(x, m, sqrt(variance)) * (variance^(-1) * (x - m))
+}
+
+value_dnorm = function(x, m) {
+  Sigma = diag(length(m))
+  return(dmvnorm(x, m, Sigma))
 }
 
 ###################################
@@ -75,40 +86,45 @@ where_evaluate = function(x, bounds, sum_elem = 3L) {
 # sum_elem: number of elements to consider on left and right
 ##
 
-get_f_out = function(dcurrent, m, Sigma, bounds, sum_elem) {
-  f_out = function(x) {
-    xmod = where_evaluate(x, bounds, sum_elem)
-    out = apply(xmod, 1, function(x) {dcurrent(x, m, Sigma)})
-    if(is.null(dim(out)[1])) { # 1D = Evaluation of a density
-      return(sum(out))
-    } else { # 2D or more = Evaluation of the derivative
-      return(apply(out, 1, sum))
+get_f_out = function(dcurrent, m, bounds, sum_elem) {
+  
+  if(all(is.infinite(bounds)) || sum_elem == 0L) {
+    f_out = function(x) { dcurrent(x, m) }
+  } else {
+    f_out = function(x) {
+      xmod = where_evaluate(x, bounds, sum_elem)
+      out = apply(xmod, 1, function(x) {dcurrent(x, m)})
+      if(is.null(dim(out)[1])) { # 1D = Evaluation of a density
+        return(sum(out))
+      } else { # 2D or more = Evaluation of the derivative
+        return(apply(out, 1, sum))
+      }
     }
   }
   return(f_out)
 }
 
 ## Examples
-# get_f_out(dmvnorm, c(0,0,0), diag(3), c(1,2,3), 3L)(c(0, 0, 0))
-# get_f_out(dmvnorm, c(0), diag(1), c(2), 3L)(c(0))
+# get_f_out(dmvnorm, c(0,0,0), c(1,2,3), 3L)(c(0, 0, 0))
+# get_f_out(dmvnorm, c(0), c(2), 3L)(c(0))
 # 
-# get_f_out(deriv_dnorm, c(0,0,0), diag(3), c(1,2,3), 3L)(c(0, 0, 0))
-# get_f_out(deriv_dnorm, c(0,0,0), diag(3), c(+Inf, +Inf, +Inf), 3L)(c(0, 0, 0))
-# get_f_out(deriv_dnorm, c(0,0,0), diag(3), c(+Inf, +Inf, +Inf), 3L)(c(1, 0, 0))
+# get_f_out(deriv_dnorm, c(0,0,0), c(1,2,3), 3L)(c(0, 0, 0))
+# get_f_out(deriv_dnorm, c(0,0,0), c(+Inf, +Inf, +Inf), 3L)(c(0, 0, 0))
+# get_f_out(deriv_dnorm, c(0,0,0), c(+Inf, +Inf, +Inf), 3L)(c(1, 0, 0))
 # 
-# get_f_out(deriv_dnorm, c(0), diag(1), c(+Inf), 3L)(0)
-# get_f_out(deriv_dnorm, c(0), diag(1), c(+Inf), 3L)(1)
+# get_f_out(deriv_dnorm, c(0), c(+Inf), 3L)(0)
+# get_f_out(deriv_dnorm, c(0), c(+Inf), 3L)(1)
 
 ##################
 # Normal density #
 ##################
-f = function(m = rep(0, 3), sigma = diag(3), bounds = c(+Inf, +Inf, +Inf), sum_elem = 10L) {
-  return(get_f_out(dmvnorm, m, sigma, bounds, sum_elem))
+f = function(m = rep(0, 3), bounds = c(+Inf, +Inf, +Inf), sum_elem = 10L) {
+  return(get_f_out(value_dnorm, m, bounds, sum_elem))
 }
 
 ####################################
 # Derivative of the Normal density #
 ####################################
-Df = function(m = rep(0, 3), sigma = diag(3), bounds = c(+Inf, +Inf, +Inf), sum_elem = 10L) {
-  return(get_f_out(deriv_dnorm, m, sigma, bounds, sum_elem))
+Df = function(m = rep(0, 3), bounds = c(+Inf, +Inf, +Inf), sum_elem = 10L) {
+  return(get_f_out(deriv_dnorm, m, bounds, sum_elem))
 }

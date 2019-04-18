@@ -3,11 +3,10 @@
 ####################
 mix_func = function(f, particles, bound = +Inf, sum_elem = 3L) {
   dim = length(particles[[1]])
-  Sigma = diag(dim)
   bounds = rep(bound, dim)
   function(x) {
     out = sapply(particles, function(particle_pos) {
-      f(particle_pos, Sigma, bounds, sum_elem)(x)
+      f(particle_pos, bounds, sum_elem)(x)
     })
     if(is.null(dim(out)[1])) { # 1D = Evaluation of a density
       return(mean(out))
