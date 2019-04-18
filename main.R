@@ -8,6 +8,20 @@ source("helpers/1_density.R")
 source("helpers/2_dynamic.R")
 source("helpers/3_plot.R")
 
+convert_array_to_df = function(arrayout) {
+  df = as.data.frame.table(arrayout, base = list(paste0("dim", 1:dim(arrayout)[1]),
+                                                 paste0("part", 1:dim(arrayout)[2]),
+                                                 as.character(1:dim(arrayout)[3])))
+  df[,3] = as.numeric(df[,3])
+  
+  df1 <- spread(data = df, key = Var1, value = Freq)
+  head(df1)
+  names(df1) = c("particle", "iteration", "dim1", "dim2")
+  
+  return(df1)
+}
+
+
 particles = list(c(0,0,0), c(0,0,1), c(1,0,0), c(2,0,1))
 types = list(c(1,1,-1), c(1,1,1), c(-1,-1,1), c(1,1,-1))
 n = 1000
@@ -142,12 +156,13 @@ plot(N, 1/(N/(2*pi*exp(1))^N))
 # profvis({
 
 set.seed(1234)
-N = 10
-a = 2
+N = 30
+a = 0.1
 particles = lapply(1:N, function(x) {c(runif(1, -a, a), runif(1, -a, a))})
-types = lapply(1:N, function(x) {c(2*rbinom(1, 1, 0.5) - 1, 2*rbinom(1, 1, 0.5) - 1)})
+#types = lapply(1:N, function(x) {c(2*rbinom(1, 1, 0.5) - 1, 2*rbinom(1, 1, 0.5) - 1)})
+types = lapply(1:N, function(x) {if(x %% 2 == 0) {c(1, 1)} else {c(-1, -1)}})
 
-n = 100000
+n = 2000
 alpha = 1
 bound = +Inf
 sum_elem = 3L
@@ -157,7 +172,7 @@ df = convert_array_to_df(arrayout)
 df$alpha = df$iteration/max(df$iteration)
 
 # })
-png("out100000.png", 1000, 1000)
+#png("out100000.png", 1000, 1000)
 ggplot(df, aes(x = jitter(dim1), y = jitter(dim2), colour = particle, alpha = alpha)) +
   geom_path() +
   theme(legend.position="none") #+
@@ -169,7 +184,7 @@ ggplot(df, aes(x = jitter(dim1), y = jitter(dim2), colour = particle, alpha = al
   #       panel.background=element_blank(),panel.border=element_blank(),
   #       panel.grid.major=element_blank(),
   #       panel.grid.minor=element_blank(),plot.background=element_blank())
-dev.off()
+#dev.off()
 
 
 
