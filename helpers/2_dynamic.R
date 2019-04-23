@@ -89,6 +89,7 @@ push_n = function(particles = list(c(0,0,0), c(0,0,1), c(1,0,0), c(2,0,1)),
     to_append = sapply(to_append, c)
     arrayout = abind(arrayout, to_append, along=3)
   }
+  rownames(arrayout) = NULL
   return(arrayout)
 }
 

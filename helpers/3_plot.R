@@ -14,17 +14,23 @@ convert_array_to_df = function(arrayout) {
   return(df1)
 }
 
-plotting = function(particles, types, n, alpha, Df, bound, sum_elem,
-                    no_axes = TRUE) {
+compute = function(particles, types, n, alpha, Df, bound, sum_elem) {
   arrayout = push_n(particles, types, n, alpha, Df, bound, sum_elem)
   df = convert_array_to_df(arrayout)
   df$alpha = df$iteration/max(df$iteration) # for the moving effect
+  return(df)
+}
+
+plotting = function(df, axes = FALSE) {
+  
+  # df$dim1 = df$dim1 %% bound
+  # df$dim2 = df$dim2 %% bound
   
   # En vue de dessus, trajectoire de chaque particule (tous les x pas)
   my_gg = ggplot(df, aes(x = jitter(dim1), y = jitter(dim2), colour = particle, alpha = alpha)) + 
     geom_path() 
   
-  if(no_axes) {
+  if(!axes) {
     my_gg = my_gg +
       theme(axis.line=element_blank(),axis.text.x=element_blank(),
             axis.text.y=element_blank(),axis.ticks=element_blank(),
