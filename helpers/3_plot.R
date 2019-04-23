@@ -1,24 +1,41 @@
-
-
-## Plotting
-plotting = function(x, m, type, f, Df, sigma, bounds, sum_elem, with_deriv = FALSE, ...) {
-  g = mix_func(f, m, sigma, bounds, sum_elem)
-  Dg = mix_func(Df, m, sigma, bounds, sum_elem)
+############################
+# Two-dimensional plotting #
+############################
+convert_array_to_df = function(arrayout) {
+  df = as.data.frame.table(arrayout, base = list(paste0("dim", 1:dim(arrayout)[1]),
+                                                 paste0("part", 1:dim(arrayout)[2]),
+                                                 as.character(1:dim(arrayout)[3])))
+  df[,3] = as.numeric(df[,3])
   
-  if(is.null(x)) {
-    x = seq(from = -3, to = 3, length.out = 1000)
-  }
+  df1 <- spread(data = df, key = Var1, value = Freq)
+  head(df1)
+  names(df1) = c("particle", "iteration", "dim1", "dim2")
   
-  if(with_deriv) {
-    ylim = range(c(g(x), Dg(x)))
-    plot(x, g(x), type = "l", ylim = ylim, ...)
-    lines(x, Dg(x), col = "red")
-    points(m, g(m), type = "p", col = "black")
-    points(m, Dg(m), type = "p", col = "red")
-  } else {
-    plot(x, g(x), type = "l", ...)
-    points(m, g(m), type = "p", col = ifelse(type == 1, "blue", "red"))
-    points(m - 2*pi, g(m), type = "p", col = "black")
-    points(m + 2*pi, g(m), type = "p", col = "black")
-  }
+  return(df1)
 }
+
+plotting = function(particles, types, n, alpha, Df, bound, sum_elem,
+                    no_axes = TRUE) {
+  arrayout = push_n(particles, types, n, alpha, Df, bound, sum_elem)
+  df = convert_array_to_df(arrayout)
+  df$alpha = df$iteration/max(df$iteration) # for the moving effect
+  
+  # En vue de dessus, trajectoire de chaque particule (tous les x pas)
+  my_gg = ggplot(df, aes(x = jitter(dim1), y = jitter(dim2), colour = particle, alpha = alpha)) + 
+    geom_path() 
+  
+  if(no_axes) {
+    my_gg = my_gg +
+      theme(axis.line=element_blank(),axis.text.x=element_blank(),
+            axis.text.y=element_blank(),axis.ticks=element_blank(),
+            axis.title.x=element_blank(),
+            axis.title.y=element_blank(),legend.position="none",
+            panel.background=element_blank(),panel.border=element_blank(),panel.grid.major=element_blank(),
+            panel.grid.minor=element_blank(),plot.background=element_blank())
+  }
+  return(my_gg)
+}
+
+############################
+# One-dimensional plotting #
+############################
