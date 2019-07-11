@@ -17,7 +17,9 @@ plot(N, N/(2*pi*exp(1))^N)
 plot(N, 1/(N/(2*pi*exp(1))^N))
 
 
-# retrieve equ diff
+# retrieve equ diff:
+
+$$f_t^{\alpha}(x) --> f_{t + dt}^{\alpha}(x) = \sum_{y ; y + f'_{t}(y) \alpha = x} f_t^{\alpha}(y) = \sum_{y ; y + f'_{t}(y) dx = x} f_t^{dx}(y).$$
 
 
 

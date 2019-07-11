@@ -54,20 +54,32 @@ sum_elem = 3L
 particles = list(c(0, 0), c(1, 1), c(0, 5), c(1, 4))
 types = list(c(1, 1), c(-1, -1), c(1, 1), c(-1, -1))
 df = compute(particles, types, n, alpha, Df, bound, sum_elem)
-plotting(df, axes = TRUE)
-
+pdf("out_may.pdf", 2, 2)
+plotting(df, axes = TRUE) + theme_bw() + theme(legend.position="none",
+                                               axis.title.x=element_blank(),
+                                               axis.text.x=element_blank(),
+                                               axis.ticks.x=element_blank(),
+                                               axis.title.y=element_blank(),
+                                               axis.text.y=element_blank(),
+                                               axis.ticks.y=element_blank())
+dev.off()
 ######
 #
 #####################################
 set.seed(1234)
 N = 2
 a = 1
-n = 10000
+n = 5000
 alpha = 1
 bound = +8
 sum_elem = 3L
 particles = list(c(0, 0), c(1, 1), c(1, 4), c(0, 5))
 types = list(c(1, 1), c(-1, -1), c(1, 1), c(-1, -1))
 df = compute(particles, types, n, alpha, Df, bound, sum_elem)
-plotting(df, axes = TRUE)
-
+plotting(df, axes = TRUE) + theme_bw() + theme(legend.position="none",
+                                               axis.title.x=element_blank(),
+                                               axis.text.x=element_blank(),
+                                               axis.ticks.x=element_blank(),
+                                               axis.title.y=element_blank(),
+                                               axis.text.y=element_blank(),
+                                               axis.ticks.y=element_blank())
