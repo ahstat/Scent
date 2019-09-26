@@ -2,23 +2,16 @@
 # Two-dimensional plotting #
 ############################
 convert_array_to_df = function(arrayout) {
-  df = as.data.frame.table(arrayout, base = list(paste0("dim", 1:dim(arrayout)[1]),
-                                                 paste0("part", 1:dim(arrayout)[2]),
+  df = as.data.frame.table(arrayout, base = list(paste0("part", 1:dim(arrayout)[1]),
+                                                 paste0("dim", 1:dim(arrayout)[2]),
                                                  as.character(1:dim(arrayout)[3])))
   df[,3] = as.numeric(df[,3])
   
-  df1 <- spread(data = df, key = Var1, value = Freq)
+  df1 <- spread(data = df, key = Var2, value = Freq) # spread the dimension component
   head(df1)
   names(df1) = c("particle", "iteration", "dim1", "dim2")
   
   return(df1)
-}
-
-compute = function(particles, types, n, alpha, Df, bound, sum_elem) {
-  arrayout = push_n(particles, types, n, alpha, Df, bound, sum_elem)
-  df = convert_array_to_df(arrayout)
-  df$alpha = df$iteration/max(df$iteration) # for the moving effect
-  return(df)
 }
 
 plotting = function(df, axes = FALSE) {

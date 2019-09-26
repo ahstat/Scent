@@ -93,38 +93,29 @@ move1 = function(positions, types, eps = 0.1) {
   return(list("positions" = positions, "grad" = grad))
 }
 
+move = function(particles, steps = 100, eps = 0.1,
+                print_every = 1e16) {
+  positions = particles$positions
+  types = particles$types
 
-# Moving multiple steps
-# TODO
-move = function(particles = list(c(0,0,0), c(0,0,1), c(1,0,0), c(2,0,1)), 
-                  types = list(c(1,1,-1), c(1,1,1), c(-1,-1,1), c(1,1,-1)),
-                  n = 100,
-                  alpha = 0.1, Df, bound = +Inf, sum_elem = 3L) {
-  init = array(sapply(particles, c), 
-               dim = c(length(particles[[1]]), length(particles), 1))
+  # Moving multiple steps
+  init = array(positions, 
+               dim = c(dim(positions), 1))
   arrayout = init
   
-  for(k in 1:(n-1)) {
-    if(k %% 10 == 0) {
+  init_grad = array(NA,
+                    dim = c(dim(positions), 1))
+  arrayout_grad = init_grad
+  
+  for(k in 1:steps) {
+    # print_every may be 10, 100, ... or 1e16
+    if(k %% print_every == 0) {
       print(k)
     }
     current = arrayout[,,dim(arrayout)[3]]
-    current = lapply(1:ncol(current), function(col){current[, col]})
-    to_append = push(current, types, alpha, Df, bound, sum_elem)
-    
-    to_append = sapply(to_append, c)
-    arrayout = abind(arrayout, to_append, along=3)
+    to_append = move1(current, types, eps)
+    arrayout = abind(arrayout, to_append$positions, along=3)
+    arrayout_grad = abind(arrayout_grad, to_append$grad, along=3)
   }
-  rownames(arrayout) = NULL
-  return(arrayout)
-}
-delta_n = function(arrayout) {
-  n = dim(arrayout)[3]
-  delta = rep(NA, n-1)
-  for(i in 2:n) {
-    a1 = arrayout[,,i]
-    a2 = arrayout[,,i-1]
-    delta[i-1] = sqrt(mean((a1 - a2)^2))
-  }
-  return(delta)
+  return(list("positions" = arrayout, "grad" = arrayout_grad))
 }
