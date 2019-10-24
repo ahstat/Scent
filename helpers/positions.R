@@ -1,4 +1,9 @@
-# * What is the object `positions`:
+#############
+# Positions #
+#############
+# * Generalization: Take complex number instead of real numbers
+
+# - What is the object `positions`:
 # It is a matrix describing the position of each particle.
 # It has a dimension nb_particles x space_nb_dimension
 # Ex: particle 1 is positions[1,] a vector with position in each
@@ -8,8 +13,8 @@
 #                      0.5,   0,
 #                      0,   0.5,
 #                      0.5, 0.5), nrow = 4, ncol = 2, byrow = TRUE)
-
-# * What is the object `types`:
+#
+# - What is the object `types`:
 # It is the behavior -1 (repulsing) or 1 (attracting) of the particles
 
 init_4_sinmove = function(a = 0.5, b = 0.5) {

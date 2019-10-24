@@ -14,13 +14,22 @@ convert_array_to_df = function(arrayout) {
   return(df1)
 }
 
-plotting = function(df, axes = FALSE) {
-  
-  # df$dim1 = df$dim1 %% bound
-  # df$dim2 = df$dim2 %% bound
+plotting = function(evolution, axes = FALSE, gridlim = NA) {
+  df = convert_array_to_df(evolution$positions)
+  df$alpha = (df$iteration - 1)/max(df$iteration) # for the moving effect
+  return(plotting_df(df, axes, gridlim))
+}
+
+plotting_df = function(df, axes = FALSE, gridlim = NA) {
+  if(!is.na(gridlim)) {
+    df$dim1 = df$dim1 %% gridlim
+    df$dim2 = df$dim2 %% gridlim
+  }
   
   # En vue de dessus, trajectoire de chaque particule (tous les x pas)
-  my_gg = ggplot(df, aes(x = jitter(dim1), y = jitter(dim2), colour = particle, alpha = alpha)) + 
+  #my_gg = ggplot(df, aes(x = jitter(dim1), y = jitter(dim2), colour = particle, alpha = alpha)) + 
+  #  geom_path() 
+  my_gg = ggplot(df, aes(x = dim1, y = dim2, colour = particle, alpha = alpha)) + 
     geom_path() 
   
   if(!axes) {
