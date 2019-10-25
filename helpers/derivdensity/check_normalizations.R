@@ -1,6 +1,8 @@
 #################################
 # Helper: Normalization machine #
 #################################
+# Note: the normalization constant slow down the complete behavior
+# but does not change the trajectory if initial positions are changed too.
 normalize_approx = function(f, dim,
                             x_such_as_with_f_of_x_is_tiny = 10,
                             the_greater_the_more_precise = 10000) {
@@ -46,3 +48,15 @@ check_f = function(f, dim,
     return("not OK")
   }
 }
+
+checkEquals(check_f(f_derivdnorm1, 1), "OK")
+checkEquals(check_f(f_derivdnorm2, 2), "OK")
+checkEquals(check_f(f_derivdnorm3, 3), "OK")
+checkEquals(check_f(f_derivdnorm4, 4), "OK")
+checkEquals(check_f(f_derivdnorm5, 5), "OK")
+checkEquals(check_f(f_approxderivdnorm, 1), "OK")
+# Not reliable:
+# check_f(function(x) {f_approxderivdnorm(x) / 1.83102486054227}, 2)
+# check_f(function(x) {f_approxderivdnorm(x)} / 3.13792824730532, 3)
+# check_f(function(x) {f_approxderivdnorm(x) / 5.09189559916112}, 4)
+# check_f(function(x) {f_approxderivdnorm(x) / 7.88209053818594}, 5)

@@ -3,33 +3,26 @@ library(abind)
 library(tidyr)
 library(ggplot2)
 library(RUnit)
+library(rgl)
 rm(list = ls())
 debug = TRUE
 setwd("~/Documents/GitHub/scent/")
+source("helpers/plot/plot1d.R")
+source("helpers/plot/plot2d.R")
+source("helpers/plot/plot3d.R")
 source("helpers/directions/real.R")
 source("helpers/directions/torus.R")
-source("helpers/plot/plot2d.R")
-#todo:
 source("helpers/directions/main_directions.R")
-
-
 source("helpers/derivdensity/approxderivdnorm.R")
 source("helpers/derivdensity/derivdnorm.R")
-source("helpers/derivdensity/main_derivdensity.R")
-source("helpers/derivdensity/misc.R")
-
-
-source("helpers/helpers.R")
+source("helpers/derivdensity/check_derivdensity_functions.R")
+source("helpers/derivdensity/check_normalizations.R")
+# todo
+source("helpers/motion/one_step.R")
+source("helpers/motion/main_motion.R")
 source("helpers/positions.R")
-source("helpers/plot.R")
-source("helpers/moves.R")
+source("helpers/plot/plot.R")
 
-
-#TODO:
-# Distance and normal direction (to output once, together) for:
-# 1. Eucl on R^N
-# 2. Eucl on torus.
-# With unit tests and graphical proves...
 
 
 ########
