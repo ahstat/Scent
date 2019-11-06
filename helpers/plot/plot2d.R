@@ -1,7 +1,7 @@
 #######################################
 # Plot positions and directions in 2D #
 #######################################
-plot2d_positions_and_directions_debug = function(positions, length_segment = NA, type = "real", options) {
+plot2d_positions_and_directions_debug = function(positions, length_segment = NA, manifold = "real", options) {
   dim_space = dim(positions)[2]
   if(dim_space != 2) {
     stop("Plotting for dimension 2 data only")
@@ -11,13 +11,13 @@ plot2d_positions_and_directions_debug = function(positions, length_segment = NA,
     stop("Plotting for at least 2 positions")
   }
   
-  dn_pos = dn_positions(positions, type, options)
+  dn_pos = dn_positions(positions, manifold, options)
   
-  if(type == "real") {
+  if(manifold == "real") {
     positions0 = positions
     xlim = range(positions0[,1]*1.1)
     ylim = range(positions0[,2]*1.1)
-  } else if(type == "torus") {
+  } else if(manifold == "torus") {
     positions0 = reduce_into_canonical_repr(positions, options$torus_dim)
     xlim = range(c(0, options$torus_dim[1]))
     ylim = range(c(0, options$torus_dim[2]))
@@ -28,14 +28,14 @@ plot2d_positions_and_directions_debug = function(positions, length_segment = NA,
   
   for(i in 1:nrow(positions0)) {
     for(j in (1:nrow(positions0))[-i]) {
-      my_segment = segment_from_to(i, j, length_segment, positions0, dn_pos, type, options)
+      my_segment = segment_from_to(i, j, length_segment, positions0, dn_pos, manifold, options)
       lines(my_segment)
     }
   }
 }
 
 # Helper for `plot_positions_and_directions`
-segment_from_to = function(i, j, length_segment = NA, positions0, dn_pos, type = "real", options) {
+segment_from_to = function(i, j, length_segment = NA, positions0, dn_pos, manifold = "real", options) {
   if(is.na(length_segment)) {
     length_segment = dn_pos$d_positions[i,j]
   }
@@ -43,7 +43,7 @@ segment_from_to = function(i, j, length_segment = NA, positions0, dn_pos, type =
   segment_i_to_j = seq2d(positions0[i,], # origin of the segment
                          positions0[i,] + length_segment*dn_pos$n_positions[i,j,]) # final position of the segment
   
-  if(type == "torus") {
+  if(manifold == "torus") {
     segment_i_to_j = segment_torus(segment_i_to_j, options)
   }
   

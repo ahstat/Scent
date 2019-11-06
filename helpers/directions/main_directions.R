@@ -5,11 +5,11 @@
 ##
 # Main function
 ##
-dn_positions = function(positions, type = "real", options = list()) {
-  if(type == "real") {
+dn_positions = function(positions, manifold = "real", options = list()) {
+  if(manifold == "real") {
     d_positions = dist_between_positions.real(positions)
     n_positions = normal_between_positions.real(positions, d_positions)
-  } else if(type == "torus") {
+  } else if(manifold == "torus") {
     # `options` should be a list containing `torus_dim` in this case
     d_positions = dist_between_positions.torus(positions, options$torus_dim)
     n_positions = normal_between_positions.torus(positions, d_positions, options$torus_dim)
@@ -67,7 +67,7 @@ positions = matrix(c(0.9, 0.9, 0.3,
                      9.1, -9.1, 1.4),
                    ncol = 3, byrow = T)
 
-type = "torus"
+manifold = "torus"
 options = list("torus_dim" = c(1, 1, 1))
 
 if(debug) {

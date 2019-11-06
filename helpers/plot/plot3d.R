@@ -1,7 +1,7 @@
 #######################################
 # Plot positions and directions in 3D #
 #######################################
-plot3d_positions_and_directions_debug = function(positions, length_segment = NA, type = "real", options,
+plot3d_positions_and_directions_debug = function(positions, length_segment = NA, manifold = "real", options,
                                                  col = FALSE,
                                                  plot_only_from = NULL) {
   dim_space = dim(positions)[2]
@@ -13,14 +13,14 @@ plot3d_positions_and_directions_debug = function(positions, length_segment = NA,
     stop("Plotting for at least 2 positions")
   }
   
-  dn_pos = dn_positions(positions, type, options)
+  dn_pos = dn_positions(positions, manifold, options)
   
-  if(type == "real") {
+  if(manifold == "real") {
     positions0 = positions
     xlim = range(positions0[,1]*1.1)
     ylim = range(positions0[,2]*1.1)
     zlim = range(positions0[,3]*1.1)
-  } else if(type == "torus") {
+  } else if(manifold == "torus") {
     positions0 = reduce_into_canonical_repr(positions, options$torus_dim)
     xlim = range(c(0, options$torus_dim[1]))
     ylim = range(c(0, options$torus_dim[2]))
@@ -45,7 +45,7 @@ plot3d_positions_and_directions_debug = function(positions, length_segment = NA,
   
   for(i in the_i) {
     for(j in (1:nrow(positions0))[-i]) {
-      my_segment = segment_from_to(i, j, length_segment, positions0, dn_pos, type, options)
+      my_segment = segment_from_to(i, j, length_segment, positions0, dn_pos, manifold, options)
       idx_na = which(is.na(my_segment[,1]))
       idx_na = c(0, idx_na, nrow(my_segment)+1)
       idx_na = unique(idx_na)

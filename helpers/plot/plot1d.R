@@ -1,7 +1,7 @@
 ##################################################################
 # Plot positions and directions in 1D as a particular case of 2D #
 ##################################################################
-plot1d_positions_and_directions_debug = function(positions, length_segment = NA, type = "real", options = list()) {
+plot1d_positions_and_directions_debug = function(positions, length_segment = NA, manifold = "real", options = list()) {
   dim_space = dim(positions)[2]
   if(dim_space != 1) {
     stop("Plotting for dimension 1 data only")
@@ -9,9 +9,9 @@ plot1d_positions_and_directions_debug = function(positions, length_segment = NA,
 
   positions = cbind(0, positions)
   
-  if(type == "torus") {
+  if(manifold == "torus") {
     options$torus_dim = c(1, options$torus_dim)
   }
   
-  plot2d_positions_and_directions_debug(positions, length_segment, type, options)
+  plot2d_positions_and_directions_debug(positions, length_segment, manifold, options)
 }

@@ -1,22 +1,72 @@
+printbounds_func = function(bounds) {
+  printbounds = sapply(bounds, function(b) {
+    if(is.infinite(b)) {return("(-Inf, +Inf)")} else {return(paste0("[0, ", b, ")"))}
+  })
+  print(paste0("Particles will evolve in a ", length(bounds), "D space, with bounds: ", paste(printbounds, collapse = " x ")))
+}
+
+##############################
+# Evaluation modulo `bounds` #
+##############################
+where_evaluate_func = function(bounds, sum_elem = 3L) {
+
+  # The following helper function defines the set {z ; z mod bounds = x}
+  
+  # In context:
+  # Let f be the normal density in dimension one.
+  # If we specify the bound to 2 (corresponding to [-1,1] for example), 
+  # evaluation of the density in x=0 corresponds to the sum:
+  #    f(0) + f(2) + f(-2) + f(-4) + f(4) + ... = sum[f(z) ; z mod 2 = 0]
+  
+  ##
+  # x: position for which the set is created, living in dimension `dim`
+  # bounds: bounds length for each dim, as a vector of length `dim`
+  # sum_elem: number of elements to consider on left and right
+  ##
+  
+  ## Example:
+  # where_evaluate_func(c(+Inf,2,3), sum_elem = 3L)
+  my_seq = seq(from = -sum_elem, to = sum_elem, by = 1L)
+  dim = length(bounds)
+  # Source: helpers/input_array.R for triangle-pursuit code
+  list_to_expand = list()
+  for(i in 1:dim) {
+    if(is.infinite(bounds[i])) {
+      list_to_expand[[i]] = 0
+    } else {
+      list_to_expand[[i]] = my_seq
+    }
+  }
+  xmod = expand.grid(list_to_expand)
+  for(i in 1:dim) {
+    if(is.infinite(bounds[i])) {
+      xmod[,i] = xmod[,i]
+    } else {
+      xmod[,i] = bounds[i] * xmod[,i]
+    }
+  }
+  return(xmod)
+}
+
 #############################################################
 # Distance between positions on a torus with Euclidian norm #
 #############################################################
 
-##
-# Helpers
-##
-
-## Representation of each position inside \prod_i [0, torus_dim_i]
-reduce_into_canonical_repr = function(positions, torus_dim) {
+## Representation of each position inside \prod_i [0, bound_i]
+reduce_into_canonical_repr = function(positions, bounds) {
   dim_space = ncol(positions)
-  positions0 = matrix(rep(NA, length(positions)), ncol = dim_space)
-  for(i in 1:length(torus_dim)) {
-    positions0[,i] = positions[,i] %% torus_dim[i]
+  positions0 = matrix(rep(NA, prod(dim(positions))), ncol = dim_space)
+  for(i in 1:length(bounds)) {
+    if(!is.infinite(bounds[i])) {
+      positions0[,i] = positions[,i] %% bounds[i]
+    } else {
+      positions0[,i] = positions[,i]
+    }
   }
   return(positions0)
 }
 
-## Difference of positions inside \prod_i [0, torus_dim_i]
+## Difference of positions inside \prod_i [0, bound_i]
 diff_of_positions = function(positions0) {
   dim_space = ncol(positions0)
   nb_part = nrow(positions0)
@@ -30,10 +80,14 @@ diff_of_positions = function(positions0) {
 }
 
 ## Complementary difference of position for each axis i
-complementary_abs_diff = function(abs_diff, torus_dim) {
+complementary_abs_diff = function(abs_diff, bounds) {
   border_minus_abs_diff = array(rep(NA, length(abs_diff)), dim = dim(abs_diff))
-  for(i in 1:length(torus_dim)) {
-    border_minus_abs_diff[,,i] = torus_dim[i] - abs_diff[,,i]
+  for(i in 1:length(bounds)) {
+    if(!is.infinite(bounds[i])) {
+      border_minus_abs_diff[,,i] = bounds[i] - abs_diff[,,i]
+    } else {
+      border_minus_abs_diff[,,i] = abs_diff[,,i]
+    }
   }
   return(border_minus_abs_diff)
 }
@@ -41,18 +95,24 @@ complementary_abs_diff = function(abs_diff, torus_dim) {
 ##
 # Function
 ##
-dist_between_positions.torus = function(positions, torus_dim = c(1, 2)) {
+dist_between_positions.torus = function(positions, bounds = c(1, 2), where_evaluate) {
   # Based on https://stackoverflow.com/questions/2123947
-  positions0 = reduce_into_canonical_repr(positions, torus_dim)
+  positions0 = reduce_into_canonical_repr(positions, bounds)
   global_diff = diff_of_positions(positions0)
   
   abs_diff = abs(global_diff)
-  border_minus_abs_diff = complementary_abs_diff(abs_diff, torus_dim)
+  border_minus_abs_diff = complementary_abs_diff(abs_diff, bounds)
   closer_positions = pmin(abs_diff, border_minus_abs_diff)
   
-  d_positions = apply(closer_positions, c(1,2), function(x){sqrt(sum(x^2))})
+  #d_positions = apply(closer_positions, c(1,2), function(x){sqrt(sum(x^2))})
+  d_positions_list = list()
+  for(k in 1:nrow(where_evaluate)) {
+    # https://stackoverflow.com/questions/24520720/
+    closer_positions_k = sweep(closer_positions, 3, as.numeric(where_evaluate[k,]), FUN = "+")
+    d_positions_list[[k]] = apply(closer_positions_k, c(1,2), function(x){sqrt(sum(x^2))})
+  }
   
-  return(d_positions)
+  return(d_positions_list)
 }
 
 ##
@@ -63,8 +123,10 @@ positions = matrix(c(0.9, 0.9,
                      0.0, 0.0,
                      9.1, -9.1),
                    ncol = 2, byrow = T)
-torus_dim = c(1, 1)
-dist_between_positions.torus(positions, torus_dim)
+bounds = c(1, 1)
+sum_elem = 0L
+where_evaluate = where_evaluate_func(bounds, sum_elem)
+dist_between_positions.torus(positions, bounds, where_evaluate)[[1]]
 # First, positions between [0,1]^2 are (0.9,0.9), (0.1,0.2), (0,0), (0.1,0.9)
 # Then,
 # For 1<->2, the smaller is d((-0.1,-0.1),(0.1,0.2)) i.e. sqrt(0.2^2+0.3^2)=0.36
@@ -73,7 +135,7 @@ dist_between_positions.torus(positions, torus_dim)
 # For 2<->3, the smaller is d((0.1,0.2),(0,0)) i.e. sqrt(0.1^2+0.2^2)=0.22
 # For 2<->4, the smaller is d((0.1,0.2),(0.1,-0.1)) i.e. sqrt(0^2+0.3^2)=0.3
 # For 3<->4, the smaller is d((0,0),(0.1,-0.1)) i.e. sqrt(0.1^2+0.1^2)=0.14
-rm(positions, torus_dim)
+rm(positions, bounds)
 
 ##
 # Unit test
@@ -83,14 +145,16 @@ positions = matrix(c(0.9, 0.9,
                      0.0, 0.0,
                      9.1, -9.1),
                    ncol = 2, byrow = T)
-torus_dim = c(1, 1)
-checkEqualsNumeric(dist_between_positions.torus(positions, torus_dim),
+bounds = c(1, 1)
+sum_elem = 0L
+where_evaluate = where_evaluate_func(bounds, sum_elem)
+checkEqualsNumeric(dist_between_positions.torus(positions, bounds, where_evaluate)[[1]],
                    matrix(c(0, sqrt(0.2^2+0.3^2), sqrt(0.1^2+0.1^2), sqrt(0.2^2+0^2),
                             sqrt(0.2^2+0.3^2), 0, sqrt(0.1^2+0.2^2), sqrt(0^2+0.3^2),
                             sqrt(0.1^2+0.1^2), sqrt(0.1^2+0.2^2), 0, sqrt(0.1^2+0.1^2),
                             sqrt(0.2^2+0^2), sqrt(0^2+0.3^2), sqrt(0.1^2+0.1^2), 0),
                           ncol = 4, byrow = TRUE))
-rm(positions, torus_dim)
+rm(positions, bounds)
 
 #####################################################
 # Normalized direction between positions on a torus #
@@ -112,14 +176,13 @@ which.pmin = function(x, y) {
 ##
 # Function
 ##
-normal_between_positions.torus = function(positions, dist_between_positions, torus_dim) {
-  
-  positions0 = reduce_into_canonical_repr(positions, torus_dim)
+normal_between_positions.torus = function(positions, dist_between_positions, bounds, where_evaluate) {
+  positions0 = reduce_into_canonical_repr(positions, bounds)
   global_diff = diff_of_positions(positions0)
   
   abs_diff = abs(global_diff)
   sign_diff = sign(global_diff)
-  border_minus_abs_diff = complementary_abs_diff(abs_diff, torus_dim)
+  border_minus_abs_diff = complementary_abs_diff(abs_diff, bounds)
   
   # Which.min: abs_diff ("x") or border_minus_abs_diff ("y")
   nb_part = nrow(positions0)
@@ -134,15 +197,20 @@ normal_between_positions.torus = function(positions, dist_between_positions, tor
   selected = array(NA, dim = c(nb_part, nb_part, ncol(positions0)))
   selected[which.min_out == "x"] = abs_diff[which.min_out == "x"] * sign_diff[which.min_out == "x"]
   selected[which.min_out == "y"] = border_minus_abs_diff[which.min_out == "y"] * -1 * sign_diff[which.min_out == "y"]
-
-  n_positions = array(NA, dim = c(nb_part, nb_part, ncol(positions0)))
-  for(i in 1:nb_part) {
-    for(j in 1:nb_part) {
-      n_positions[i,j,] = selected[i,j,] / dist_between_positions[i, j]
+  
+  n_positions_list = list()
+  for(k in 1:nrow(where_evaluate)) {
+    selected_k = sweep(selected, 3, as.numeric(where_evaluate[k,]), FUN = "+")
+    n_positions = array(NA, dim = c(nb_part, nb_part, ncol(positions0)))
+    for(i in 1:nb_part) {
+      for(j in 1:nb_part) {
+        n_positions[i,j,] = selected_k[i,j,] / dist_between_positions[[k]][i, j]
+      }
     }
+    n_positions_list[[k]] = n_positions
   }
   
-  return(n_positions)
+  return(n_positions_list)
 }
 
 ##
@@ -153,9 +221,11 @@ positions = matrix(c(0.9, 0.9,
                      0.0, 0.0,
                      9.1, -9.1),
                    ncol = 2, byrow = T)
-torus_dim = c(1, 1)
-dist_between_positions = dist_between_positions.torus(positions, torus_dim)
-round(normal_between_positions.torus(positions, dist_between_positions, torus_dim), 2)
+bounds = c(1, 1)
+sum_elem = 0L
+where_evaluate = where_evaluate_func(bounds, sum_elem)
+dist_between_positions = dist_between_positions.torus(positions, bounds, where_evaluate)
+round(normal_between_positions.torus(positions, dist_between_positions, bounds, where_evaluate)[[1]], 2)
 # As shown in the example for the function dist_between_positions.torus,
 # a couple of position giving the smallest distance is as follows, for each
 # pair:
@@ -201,7 +271,7 @@ round(normal_between_positions.torus(positions, dist_between_positions, torus_di
 # -0.83   NaN -0.89    -1        Y
 # -0.71  0.89   NaN -0.71
 #     0     1  0.71   NaN
-rm(positions, torus_dim, dist_between_positions)
+rm(positions, bounds, dist_between_positions)
 
 ##
 # Unit test
@@ -211,9 +281,11 @@ positions = matrix(c(0.9, 0.9,
                      0.0, 0.0,
                      9.1, -9.1),
                    ncol = 2, byrow = T)
-torus_dim = c(1, 1)
-dist_between_positions = dist_between_positions.torus(positions, torus_dim)
-checkEqualsNumeric(round(normal_between_positions.torus(positions, dist_between_positions, torus_dim), 2),
+bounds = c(1, 1)
+sum_elem = 0L
+where_evaluate = where_evaluate_func(bounds, sum_elem)
+dist_between_positions = dist_between_positions.torus(positions, bounds, where_evaluate)
+checkEqualsNumeric(round(normal_between_positions.torus(positions, dist_between_positions, bounds, where_evaluate)[[1]], 2),
                    array(c(NaN,-0.55,-0.71,-1, # by column (X)
                            0.55, NaN, 0.45, 0,
                            0.71, -0.45, NaN, -0.71,
@@ -222,4 +294,4 @@ checkEqualsNumeric(round(normal_between_positions.torus(positions, dist_between_
                            NaN, 0.89, 1, 0.71,
                            -0.89, NaN, 0.71, 0,
                            -1, -0.71, NaN), dim = c(4,4,2)))
-rm(positions, torus_dim, dist_between_positions)
+rm(positions, bounds, dist_between_positions)
