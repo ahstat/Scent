@@ -1,115 +1,105 @@
-library(fields)
-library(abind)
-library(tidyr)
-library(ggplot2)
-library(RUnit)
-library(rgl)
 rm(list = ls())
-debug = TRUE
 setwd("~/Documents/GitHub/scent/")
-source("helpers/plot/plot1d.R")
-source("helpers/plot/plot2d.R")
-source("helpers/plot/plot3d.R")
-source("helpers/directions/real.R")
-source("helpers/directions/torus.R")
-source("helpers/directions/main_directions.R")
-source("helpers/derivdensity/approxderivdnorm.R")
-source("helpers/derivdensity/derivdnorm.R")
-source("helpers/derivdensity/check_derivdensity_functions.R")
-source("helpers/derivdensity/check_normalizations.R")
-# todo
-source("helpers/motion/one_step.R")
-source("helpers/motion/main_motion.R")
-source("helpers/positions.R")
-source("helpers/plot/plot.R")
-
-
-
-########
-# Demo #
-########
-move_4_particles_1()
-move_4_particles_2()
-
-##############
-# Parameters #
-##############
-
-d = d_eucl
-f = f_derivdnorm2
-steps = 50
-eps = 1
-
-set.seed(1234)
-N = 200
-a = 5
-positions = lapply(1:N, function(x) {c(runif(1, -a, a), runif(1, -a, a))})
-positions = t(sapply(positions, c))
-types = sapply(1:N, function(x) {c(2*rbinom(1, 1, 0.5) - 1)})
-particles = list("positions" = positions, "types" = types)
-#return(particles)
-
-########
-# Code #
-########
-steps = 100000
-evolution = move(particles, steps, eps, d, f, 10, action)
-df = convert_array_to_df(evolution$positions)
-df$alpha = (df$iteration - 1)/max(df$iteration) # for the moving effect
-plotting_df(df, axes = FALSE)
-
-###############################################################################
-
-# Todo: grid of size (20,20) with particles close to (10,10)
-
-d = function(x,y) {return(d_torus(x,y,5))}
-f = f_derivdnorm
-steps = 50
-eps = 0.1
-
-# set.seed(1234)
-# N = 4
-# maxpos = 1
-# positions = lapply(1:N, function(x) {c(runif(1, 0, maxpos), runif(1, 0, maxpos))})
-# positions = t(sapply(positions, c))
-
-a=0.5; b=2.5
-positions = matrix(10 + c(-a/2, -b/2,
-                           a/2, -b/2,
-                          -a/2,  b/2,
-                           a/2,  b/2
-),
-                   ncol = 2, byrow = TRUE)
-types = c(1, -1, 1, -1)
-
-# types = sapply(1:N, function(x) {c(2*rbinom(1, 1, 0.5) - 1)})
-# # types = c(1, -1, 1) #rep(1, N)
-# types = c(-1, -1, -1 ,1)
-particles = list("positions" = positions, "types" = types)
-
-steps = 1000
-evolution = move(particles, steps, eps, d, f, NA, NA) #10, actionTorus)
-evolution$grad[2,2,]
-# BUGGY.
-
-#df = convert_array_to_df(evolution$positions)
-#df$alpha = (df$iteration - 1)/max(df$iteration) # for the moving effect
-#plotting_df(df, axes = FALSE)
-
-# This problem to solve without changing color...
-# https://stackoverflow.com/questions/38505412/r-geom-path-lines-closing-sometimes-how-to-keep-them-open
+library(mvtnorm)
+library(dplyr)
+library(abind)
+#library(tidyr)
+#library(ggplot2)
+# library(profvis); profvis({})
+source("helpers/1_density.R")
+source("helpers/2_dynamic.R")
+source("helpers/3_plot.R")
 
 
 
 
+position1 = c(0.25)
+position2 = c(0.75)
+
+bounds = c(1)
+library(mvtnorm)
+#############################################################
+
+printbounds_func = function(bounds) {
+  printbounds = sapply(bounds, function(b) {
+    if(is.infinite(b)) {return("(-Inf, +Inf)")} else {return(paste0("[0, ", b, ")"))}
+  })
+  print(paste0("Particles will evolve in a ", length(bounds), "D space, with bounds: ", paste(printbounds, collapse = " x ")))
+}
 
 
-# points = matrix(runif(1000*100), nrow=1000, ncol=100)
-# set.seed(1234)
-# particles1 = matrix(runif(100*2, -3, 3), nrow = 100, ncol = 2)
-# types1 = sign(runif(nrow(particles1), -1, 1))
 
-# masse negative (page wiki)
-# sinc function (page wiki)
-# wrapped distribution (page wiki)
-# noyau de la chaleur (page wiki)
+#############################################################
+# Distance between positions on a torus with Euclidian norm #
+#############################################################
+
+## Representation of each position inside \prod_i [0, bound_i]
+reduce_into_canonical_repr = function(position, bounds) {
+  position0 = position
+  for(i in 1:length(bounds)) {
+    if(!is.infinite(bounds[i])) {
+      position0[i] = position[i] %% bounds[i]
+    } else {
+      position0[i] = position[i]
+    }
+  }
+  return(position0)
+}
+
+## Difference of positions inside \prod_i [0, bound_i]
+diff_of_positions = function(position_i, position_j) {
+  position_j - position_i
+}
+
+## Complementary difference of position for each axis i
+complementary_abs_diff = function(abs_diff, bounds) {
+  border_minus_abs_diff = rep(NA, length(abs_diff))
+  for(i in 1:length(bounds)) {
+    if(!is.infinite(bounds[i])) {
+      border_minus_abs_diff[i] = bounds[i] - abs_diff[i]
+    } else {
+      border_minus_abs_diff[i] = abs_diff[i]
+    }
+  }
+  return(border_minus_abs_diff)
+}
+
+##
+# Function
+##
+dist_between_positions.torus = function(position1, position2,
+                                        bounds = c(1, 2), where_evaluate) {
+  
+  FROM position 1
+  TO position 2 and all replicas, from closer distant to most distant. TODO
+  
+  # Based on https://stackoverflow.com/questions/2123947
+  reduce_into_canonical_repr(position, bounds)
+    
+  positions0 = reduce_into_canonical_repr(positions, bounds)
+  global_diff = diff_of_positions(positions0)
+  
+  abs_diff = abs(global_diff)
+  border_minus_abs_diff = complementary_abs_diff(abs_diff, bounds)
+  closer_positions = pmin(abs_diff, border_minus_abs_diff)
+  
+  #d_positions = apply(closer_positions, c(1,2), function(x){sqrt(sum(x^2))})
+  d_positions_list = list()
+  for(k in 1:nrow(where_evaluate)) {
+    # https://stackoverflow.com/questions/24520720/
+    closer_positions_k = sweep(closer_positions, 3, as.numeric(where_evaluate[k,]), FUN = "+")
+    d_positions_list[[k]] = apply(closer_positions_k, c(1,2), function(x){sqrt(sum(x^2))})
+  }
+  
+  return(d_positions_list)
+}
+
+
+positions.
+For each row of position, get position + where_evaluate
+
+Given a position, 
+1. take other positions
+2. for each row (of other positions), we have a position+where_evaluate set of positions
+3. order wrt distance to other positions (long but OK at first) # gives min dist --> max dist, good to check as function of sum_elem
+4. get normal w.r.t to all of those positions (sum for replicas of one other position; then mean for other positions)
