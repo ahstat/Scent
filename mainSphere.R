@@ -1,203 +1,28 @@
-# S2
+library(rgl)
+rm(list = ls())
+setwd("~/Documents/GitHub/scent")
+debug = FALSE#TRUE
+source("helpersSphere/helpers.R")
 
-##########################################################################
-# Sample uniform distribution on the surface of a unit sphere (20180501) #
-##########################################################################
-# http://mathworld.wolfram.com/HyperspherePointPicking.html
-# Pick n_elem points on S^{n-1}
-sample_surface_sphere = function(n_elem, dim_S = 2, seed = 1234) {
-  set.seed(seed)
-  n = dim_S + 1
-  M = matrix(rnorm(n * n_elem), ncol = n)
-  sample = M / sqrt(apply(M^2, 1, sum))
-  return(sample)
-}
-
-norm_Eucl_vec = function(x) {
-  # https://stackoverflow.com/questions/10933945/
-  sqrt(crossprod(x))
-}
-
-normalize_me = function(my_matrix) {
-  my_matrix / apply(my_matrix, 1, norm_Eucl_vec)
-}
-
-latlong_func = function(xyz) {
-  # https://en.wikipedia.org/wiki/N-vector
-  x = xyz[1]
-  y = xyz[2]
-  z = xyz[3]
-  lat = atan2(z, sqrt(x^2 + y^2))
-  long = atan2(y, x)
-  return(c(lat, long))
-}
-
-xyz_func = function(latlong) {
-  # https://en.wikipedia.org/wiki/N-vector
-  lat = latlong[1]
-  long = latlong[2]
-  x = cos(lat) * cos(long)
-  y = cos(lat) * sin(long)
-  z = sin(lat)
-  return(c(x, y, z))
-}
-
-xyz_func_gen = function(latlong) {
-  # generalize geographic coordinates
-  # lat1, lat2, lat3 ... lat(n-1) long
-  sin_latlong = c(sin(latlong), 1)
-  prod_cos_latlong = c(1, cumprod(cos(latlong)))
-  x = rev(prod_cos_latlong * sin_latlong)
-  return(x)
-}
-
-# xyz_func_alt = function(latlong, r = 1) {
-#   # https://fr.wikipedia.org/wiki/Coordonn%C3%A9es_sph%C3%A9riques#G%C3%A9n%C3%A9ralisation_en_dimension_n
-#   # TODO:
-#   sin_theta = sin(latlong)
-#   theta1_to_n_minus_2 = latlong[-length(latlong)] # latitudes in [0, pi] each
-#   theta_n_minus_1 = latlong[length(latlong)] # longitude in [0, 2*pi]
-#   x1 = cos(theta1)
-#   x2 = sin(theta1) * cos(theta2)
-#   xi = sin(theta1) * sin(theta2) * cos(latlong[i])
-#   ...
-#   x_n_minus_1 = sin(theta1) * ... * sin(theta_n_minus_2) * cos(theta_n_minus_1)
-#   x_n = sin(theta1) * ... * sin(theta_n_minus_2) * sin(theta_n_minus_1)
-# }
-
-great_circle_distance = function(xyz_a, xyz_b) {
-  # https://en.wikipedia.org/wiki/N-vector
-  acos(c(crossprod(xyz_a, xyz_b)))
-}
-
-n_elem = 2
-my_matrix = sample_surface_sphere(n_elem, seed = 23)
-
-
-my_matrix_converted = t(apply(my_matrix, 1, latlong_func))
-my_matrix_converted_converted = t(apply(my_matrix_converted, 1, xyz_func))
-
-crossprod(my_matrix)
-great_circle_distance(my_matrix[1,], my_matrix[2,])
-
-round(my_matrix_converted_converted - my_matrix, 10)
-
-# t = seq(from = 0, to = 1, length.out = 100)
-# cont_line = t(sapply(t, function(t) {(1-t) * my_matrix[1,] + t * my_matrix[2,]}))
-# cont_line = normalize_me(cont_line)
-# 
-# cont_line2 = t(sapply(t, function(t) {(1-t) * (-my_matrix[1,]) + t * my_matrix[2,]}))
-# cont_line2 = normalize_me(cont_line2)
-# 
-# cont_line3 = t(sapply(t, function(t) {(1-t) * (-my_matrix[1,]) + t * (-my_matrix[2,])}))
-# cont_line3 = normalize_me(cont_line3)
-# 
-# cont_line4 = t(sapply(t, function(t) {(1-t) * my_matrix[1,] + t * (-my_matrix[2,])}))
-# cont_line4 = normalize_me(cont_line4)
-
-theta = seq(from = 0, to = 2*pi, length.out = 100)
-Lambda = c(crossprod(my_matrix[1,], my_matrix[2,]))
-
-t0 = atan(- 1 / Lambda)
-
-
-# A: Initial point
-# B: Final point after t = pi/2
-A = c(-0.5720396, -0.7630453, 0.3008865)
-B = c(0.1018386, 0.8846557, -0.4549870)
-Lambda = c(crossprod(A, B))
-
-
-
-rotated = function(A, B, t) {
-  Lambda = c(crossprod(A, B))
-  if(Lambda == 1) {
-    stop("Points A and B are identical")
-  }
-  if(Lambda == -1) {
-    stop("Points A and B are on the opposite each other")
-  }
-  B_prim = (B - Lambda * A) / sqrt(1 - Lambda^2)
-  if(great_circle_distance(B, B_prim) > pi/2) {
-    stop("The first solution is not OK")
-    # Take the other solution if B_prim is distant from B
-    # B_prim = -B_prim will work in this case
-  }
-  return(cos(t) * A + sin(t) * B_prim)
-  # Explanation:
-  # We suppose A and B are not a pole each other
-  # Step 1: Find B' on the great circle A <--> B such that <A|B'>=0 [there are 2 B' like this]
-  # Find B' of the form: B' = cos(t0) A + sin(t0) B for a certain t0
-  # 0 = <A|B'> = <A|cos(t0) A + sin(t0) B> = cos(t0) + sin(t0) <A|B>
-  # - cos(t0)/sin(t0) = <A|B>
-  # tan(t0) = -1/<A|B>
-  # t_1 = atan(-1/<A|B>) + pi or t_2 = atan(-1/<A|B>)
-  # t_1 = -atan(1/<A|B>) + pi or t_2 = -atan(1/<A|B>)
-  # t_1 = -pi/2 + atan(<A|B>) or t_2 = pi/2 + atan(<A|B>)
-  # So B_prim_1 = cos(t_1) * A + sin(t_1) * B and B_prim_2 = -B_prim_1
-  #    B_prim_1 = (<A|B> * A - B) / sqrt(1 + <A|B>^2)
-  # And to normalize it is: sqrt((1-<A|B>^2)/(1+<A|B>^2))
-  # So B_prim_1 = (<A|B> * A - B) / sqrt(1 - <A|B>^2) and B_prim_2 = -B_prim_1
-  #c(crossprod(A, B_prim_1)) # ok == 0
-  #c(crossprod(B_prim_1, B_prim_1)) # ok == 1
-}
-
-
+my_matrix = sample_surface_sphere(n_elem = 2, dim_S = 3, seed = 1)
 A = my_matrix[1,]
 B = my_matrix[2,]
-cont_line = t(sapply(theta, function(t) {rotated(A, B, t)}))
+t_max = 2*pi#great_circle_distance(A, B) #/ 2  # t_max = 2*pi
+theta = seq(from = 0, to = t_max, length.out = 100)
+line_from_A_to_B = t(sapply(theta, function(t) {rotated(A, B, t)}))
+apply(line_from_A_to_B, 1, norm_Eucl_vec)
+plot(theta, apply(line_from_A_to_B, 1, function(x){great_circle_distance(line_from_A_to_B[1,], x)}))
+
+#plot_sphere()
+plot_path_on_sphere(line_from_A_to_B)
+plot_point_on_sphere(A, "red")
+plot_point_on_sphere(B, "blue")
 
 
+###
+theta = seq(from = -pi, to = pi, length.out = 100)
+plot(theta, cos(theta))
+lines(theta, sin(theta), col = "red")
 
-#cont_line = t(sapply(theta, function(t) {cos(t) * my_matrix[1,] + sin(t) * my_matrix[2,]}))
-#cont_line = t(sapply(theta, function(t) {(cos(t) + sin(t)*cos(t0)) * my_matrix[1,] + (sin(t)*sin(t0)) * my_matrix[2,] }))
-plot(theta, apply(cont_line, 1, norm_Eucl_vec)^2)
-#lines(theta, sapply(theta, function(theta){1 + c(crossprod(cos(theta) * my_matrix[1,], sin(theta) * my_matrix[2,]))}), col = "red")
-#lines(theta, (1 + sin(2*theta) * Lambda), col = "red")
-apply(cont_line, 1, norm_Eucl_vec)
-
-cont_line = normalize_me(cont_line)
-
-
-rot_func = function(M, theta) {
-  # don't like cross product, because not ok for dim n
-  # https://math.stackexchange.com/questions/175805/moving-points-along-a-curve-on-sphere
-  x = M[1]
-  y = M[2]
-  z = M[3]
-  cos(theta) * diag(3) + 
-    (1 - cos(theta)) * matrix(c(x^2, x*y, x*z, x*y, y^2, y*z, x*z, y*z, z^2), ncol = 3) +
-    sin(theta) * matrix(c(0, z, -y, -z, 0, x, y, -x, 0), ncol = 3)
-}
-
-rot_func(my_matrix[1,], 1)
-
-plot(t(apply(cont_line, 1, latlong_func)) * 360 / (2*pi), xlim = c(-30, 30))
-
-# derivative in t = 1 (action of 1 on 2):
-# a = my_matrix[2,] - my_matrix[1,]; normalize_me(t(matrix(a)))
-
-library(rgl)
-# https://stackoverflow.com/questions/34539268
-x <- cont_line[,1]
-y <- cont_line[,2]
-z <- cont_line[,3]
-spheres3d(0,0,0,lit=FALSE,color="white")
-spheres3d(0,0,0,radius=1.01,lit=FALSE,color="black",front="lines")
-spheres3d(x, y, z,col="black",radius=0.02)
-
-# x <- cont_line2[,1]
-# y <- cont_line2[,2]
-# z <- cont_line2[,3]
-# spheres3d(x, y, z,col="blue",radius=0.02)
-# 
-# x <- cont_line3[,1]
-# y <- cont_line3[,2]
-# z <- cont_line3[,3]
-# spheres3d(x, y, z,col="red",radius=0.02)
-# 
-# x <- cont_line4[,1]
-# y <- cont_line4[,2]
-# z <- cont_line4[,3]
-# spheres3d(x, y, z,col="yellow",radius=0.02)
-# 
+plot(theta, tan(theta), type = "p")
+plot(theta, 1/(cos(theta)^2), type = "l")
