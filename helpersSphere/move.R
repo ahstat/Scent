@@ -34,14 +34,23 @@ matrix_of_distances = function(my_matrix) {
 matrix_of_D_distances = function(my_matrix, Df) {
   M = matrix_of_distances(my_matrix)
   M[] <- vapply(M, Df, numeric(1))
+  M[lower.tri(M)] = t(M)[lower.tri(M)]
   return(M)
 }
 
-plot(sort(matrix_of_distances(my_matrix)), ylim = c(0, pi))
-plot((abs(sort(matrix_of_D_distances(my_matrix, Df)))))
-
-M = matrix_of_D_distances(my_matrix, Df)
-A = my_matrix[1,]
-rotated(A, my_matrix[2,], M[1,2]) - A
+# my_matrix = sample_surface_sphere(n_elem = 3, dim_S = 2, seed = 1234)
+# plot(sort(matrix_of_distances(my_matrix)), ylim = c(0, pi))
+# plot((abs(sort(matrix_of_D_distances(my_matrix, Df)))))
+# M = matrix_of_D_distances(my_matrix, Df)
+# A = my_matrix[1,]
+# B = my_matrix[2,]
+# C = my_matrix[3,]
+# rotated(A, B, M[1,2])
+# rotated(A, C, M[1,3])
+# 
+# B_prim = deriv_rotated(A, B)
+# C_prim = deriv_rotated(A, C)
+# rotated_from_derivative(A, B_prim, M[1,2])
+# rotated_from_derivative(A, C_prim, M[1,3])
 
 # To see: GMM in this case, how to get the natural combination with a distance alpha

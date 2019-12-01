@@ -21,13 +21,18 @@ norm_Eucl_vec = function(x) {
 }
 
 ## Normalize a point of R^n
-normalize_me = function(my_matrix) {
-  # Normalize each row of a matrix 
+# normalize_me = function(my_matrix) {
+#   # Normalize each row of a matrix 
+#   # The matrix consists of 1 row = 1 element in R^n
+#   #            and finally 1 row = 1 element in R^n belonging to S^{n-1}
+#   my_matrix / apply(my_matrix, 1, norm_Eucl_vec)
+# }
+normalize_me = function(vec) {
+  # Normalize each row of a matrix
   # The matrix consists of 1 row = 1 element in R^n
   #            and finally 1 row = 1 element in R^n belonging to S^{n-1}
-  my_matrix / apply(my_matrix, 1, norm_Eucl_vec)
+  vec / c(norm_Eucl_vec(vec))
 }
-rm(normalize_me)
 
 #############################################
 # Distance between two points of the sphere #
@@ -35,7 +40,46 @@ rm(normalize_me)
 great_circle_distance = function(A, B) {
   # Points are elements of R^n belonging to S^{n-1}
   # https://en.wikipedia.org/wiki/N-vector
-  acos(c(crossprod(A, B)))
+  Lambda = c(crossprod(A, B))
+  if(Lambda > 1) {
+    # case of numerical problem, when Lambda = 1.00001
+    return(0)
+  }
+  acos(Lambda)
+}
+
+################################################################################
+# Derivative of the action of B on A on the sphere (see rotated for more info) #
+################################################################################
+deriv_rotated = function(A, B) {
+  Lambda = c(crossprod(A, B))
+  if(Lambda == 1) {
+    return(NA)
+    #stop("Points A and B are identical")
+  }
+  if(Lambda == -1) {
+    return(NA)
+    #stop("Points A and B are on the opposite each other")
+  }
+  B_prim = (B - Lambda * A) / sqrt(1 - Lambda^2)
+  if(great_circle_distance(B, B_prim) > pi/2) {
+    stop("The first solution is not OK")
+    # Take the other solution if B_prim is distant from B
+    # B_prim = -B_prim will work in this case
+  }
+  return(B_prim)
+  # Explanation (read explanation of `rotated` function first):
+  # Here we know the rotation of distance t is cos(t) * A + sin(t) * B_prim
+  # When t --> 0 we go rotated(A,B,0)=A
+  # So the derivative is the limit in 0 of (rotated(A,B,t)-A)/t which is B_prim
+}
+
+#############################################################################
+# Rotated point from A to B, given A and the derivative of action of B on A #
+#############################################################################
+rotated_from_derivative = function(A, B_prim, t) {
+  return(cos(t) * A + sin(t) * B_prim)
+  # Explanation (read explanation of `rotated` function)
 }
 
 ############################################################################
@@ -52,20 +96,9 @@ rotated = function(A, B, t) {
   # * rotated(A, B, pi/2) gives B_prim (such that <A|B_prim>=0 and A,B,B_prim on the same circle)
   # * rotated(A, B, pi) gives -A
   # * rotated(A, B, 3*pi/2) gives -B_prim
-  Lambda = c(crossprod(A, B))
-  if(Lambda == 1) {
-    stop("Points A and B are identical")
-  }
-  if(Lambda == -1) {
-    stop("Points A and B are on the opposite each other")
-  }
-  B_prim = (B - Lambda * A) / sqrt(1 - Lambda^2)
-  if(great_circle_distance(B, B_prim) > pi/2) {
-    stop("The first solution is not OK")
-    # Take the other solution if B_prim is distant from B
-    # B_prim = -B_prim will work in this case
-  }
-  return(cos(t) * A + sin(t) * B_prim)
+  B_prim = deriv_rotated(A, B)
+  rotated_out = rotated_from_derivative(A, B_prim, t)
+  return(rotated_out)
   # Explanation:
   # We suppose A and B are not a pole each other
   # Step 1: Find B' on the great circle A <--> B such that <A|B'>=0 [there are 2 B' like this]
@@ -110,15 +143,15 @@ plot_sphere = function() {
   spheres3d(0, 0, 0, radius=1.01, lit=FALSE, color="black", front="lines")
 }
 
-plot_path_on_sphere = function(traj) {
+plot_path_on_sphere = function(traj, col = "black") {
   x <- traj[,1]
   y <- traj[,2]
   z <- traj[,3]
-  spheres3d(x, y, z,col="black",radius=0.02)
+  spheres3d(x, y, z,col = col,radius = 0.02)
 }
 
-plot_point_on_sphere = function(A, col = "red") {
-  spheres3d(A[1], A[2], A[3], col = col, radius = 0.1)
+plot_point_on_sphere = function(A, col = "red", radius = 0.1) {
+  spheres3d(A[1], A[2], A[3], col = col, radius = radius)
 }
 
 if(debug) {
