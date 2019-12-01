@@ -2,6 +2,20 @@ Df = function(angle) {
   -sin(angle)
 }
 
+matrix_of_weighted_contribution = function(my_matrix, Df) {
+  M_logS_weighted = array(NA, dim = c(nrow(my_matrix), nrow(my_matrix), ncol(my_matrix)))
+  for(i in 1:(nrow(my_matrix))) {
+    for(j in (1:nrow(my_matrix))) {
+      M_logS_weighted[i,j,] = LogS_weighted(my_matrix[i,], my_matrix[j,], Df)
+    }
+  }
+  return(M_logS_weighted)
+  # M_logS_weighted[A, B,] = weighted point B seen on the tangent space in A
+}
+
+#M_logS_weighted = matrix_of_weighted_contribution(my_matrix, Df)
+#mean_action_on_A_from_others = apply(M_logS_weighted[1,,], 1, mean)
+
 matrix_of_distances = function(my_matrix) {
   M = matrix(NA, nrow = nrow(my_matrix), ncol = nrow(my_matrix))
   for(i in 1:(nrow(my_matrix)-1)) {

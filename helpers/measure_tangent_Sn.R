@@ -26,12 +26,14 @@ LogS_weighted = function(A, B, Df) {
   # We rewrite the function to manage corner case: For antipodal point, we have 0*NA = 0
   theta = great_circle_distance(A, B)
   if(theta == 0) {
-    B_weighted_on_tanA = 0 # which is Df(theta) * 0
+    B_weighted_on_tanA = rep(0, length(B)) # which is Df(theta) * 0
   } else if(theta == pi) {
-    if(Df(theta) != 0) {
+    if(abs(Df(theta)) > 1e-10) {
+      print(theta)
+      print(Df(theta))
       stop("Points A and B are on the opposite each other but action Df is not 0")
     } else {
-      B_weighted_on_tanA = 0 # which is Df(theta) * anything
+      B_weighted_on_tanA = rep(0, length(B)) # which is Df(theta) * anything
     }
   } else {
     B_weighted_on_tanA = (B - A * cos(theta)) * (Df(theta) / sin(theta))
@@ -47,15 +49,17 @@ ExpS = function(A, B_on_tanA) {
   return(B)
 }
 
-# Weighted contribution of B on A on the tangent plane
-B_weighted_on_tanA = LogS_weighted(A, B, Df)
-# Weighted contribution after going back to the sphere
-B_weighted = ExpS(A, B_weighted_on_tanA)
-
-great_circle_distance(A, B_weighted)
-
-theta = great_circle_distance(A, B)
-Df(theta)
+# A = c(0, 1, 0)
+# B = c(0, 0.9, 0.5); B = B / sqrt(sum(B^2))
+# # Weighted contribution of B on A on the tangent plane
+# B_weighted_on_tanA = LogS_weighted(A, B, Df)
+# # Weighted contribution after going back to the sphere
+# B_weighted = ExpS(A, B_weighted_on_tanA)
+# 
+# great_circle_distance(A, B_weighted)
+# 
+# theta = great_circle_distance(A, B)
+# Df(theta)
 
 
 
