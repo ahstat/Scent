@@ -68,6 +68,7 @@ test3 = function(seed = 1) {
   B = c(0, 0.9, 0.5); B = B / sqrt(sum(B^2))
   C = c(1, 0, 0)
   my_matrix[1,] = A
+  my_matrix[2,] = B
   # my_matrix[2,] = C
   # my_matrix[3,] = C
   # my_matrix[4,] = C
@@ -77,7 +78,7 @@ test3 = function(seed = 1) {
   my_matrix_derivdist = matrix_of_D_distances(my_matrix, Df)
   my_matrix_deriv = deriv_rotated_array(my_matrix)
   
-  i = 4
+  i = 1
   plot_sphere()
   plot_all_paths_from_i(i, my_matrix, my_matrix_deriv)
   plot_all_points(i, my_matrix)
