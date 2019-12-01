@@ -1,24 +1,5 @@
 Df = function(angle) {
   -sin(angle)
-  # If density is C + cos(t), then we get -sin(t)
-  # We select C such that we have a density over the hypersphere
-  # If we have a sphere S(n), 
-  # We integrate from a point A to the opposite pole B, and t is the
-  # parallel from 0 (in A) to pi (in B). For pi/2, we are on the equator,
-  # of size Vol(S(n-1))*1. If we are between equator and pole, we multiply
-  # by sin(t). Since f(x) = f(t) [same value over all directions],
-  # we want f such that Vol(S(n-1))*int_0^\pi f(t) sin(t) dt is 1
-  # 
-  # In our example, int_0^\pi cos(t) sin(t) dt = 0 so
-  # Vol(S(n-1))*int_0^\pi f(t) sin(t) dt = Vol(S(n-1)) * C * int_0^\pi sin(t) dt
-  #                                      = Vol(S(n-1)) * C * 2 = 1
-  # So: C = 1 / (4 * Vol(S(n-1))) = Gamma(n/2) / (4*pi^(n/2))
-  #
-  # t = seq(from = -pi, to = pi, length.out = 100)
-  # plot(t, 1 + cos(t), ylim = c(-1, 2))
-  # lines(t, -sin(t), col = "red")
-  #
-  # Maybe more natural densities
 }
 
 matrix_of_distances = function(my_matrix) {
@@ -53,4 +34,21 @@ matrix_of_D_distances = function(my_matrix, Df) {
 # rotated_from_derivative(A, B_prim, M[1,2])
 # rotated_from_derivative(A, C_prim, M[1,3])
 
-# To see: GMM in this case, how to get the natural combination with a distance alpha
+deriv_rotated_array = function(my_matrix) {
+  deriv_M = array(NA, dim = c(nrow(my_matrix), nrow(my_matrix), ncol(my_matrix)))
+  for(i in 1:(nrow(my_matrix))) {
+    for(j in (1:nrow(my_matrix))[-i]) {
+      deriv_M[i,j,] = deriv_rotated(my_matrix[i,], my_matrix[j,])
+    }
+  }
+  return(deriv_M)
+}
+
+get_mean_tangent_with_weights_from_i = function(i, dir_points, my_matrix_derivdist, my_matrix_deriv) {
+  N = nrow(my_matrix_derivdist)
+  each_tangent = sapply(1:N, function(j){dir_points[j]*my_matrix_derivdist[i,j]*my_matrix_deriv[i,j,]})
+  each_tangent = each_tangent[,-i]
+  mean_tangent = apply(each_tangent, 1, sum)
+  mean_tangent = mean_tangent / N
+  return(mean_tangent)
+}

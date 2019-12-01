@@ -1,37 +1,17 @@
-###############################################################
-# Sample uniform distribution on the surface of a unit sphere #
-###############################################################
-sample_surface_sphere = function(n_elem, dim_S = 2, seed = 1234) {
-  # Pick n_elem points on S^{n-1} (20180501)
-  # http://mathworld.wolfram.com/HyperspherePointPicking.html
-  set.seed(seed)
-  n = dim_S + 1
-  M = matrix(rnorm(n * n_elem), ncol = n)
-  sample = M / sqrt(apply(M^2, 1, sum))
-  return(sample)
-}
+# Measure between two points A, B of S^{n-1}
 
 ############
 # Get norm #
 ############
-norm_Eucl_vec = function(x) {
-  # Return ||x|| of a point of R^n
+norm_Eucl_vec = function(A) {
+  # Return ||A|| of a point of R^n
   # https://stackoverflow.com/questions/10933945/
-  sqrt(crossprod(x))
+  sqrt(crossprod(A))
 }
 
-## Normalize a point of R^n
-# normalize_me = function(my_matrix) {
-#   # Normalize each row of a matrix 
-#   # The matrix consists of 1 row = 1 element in R^n
-#   #            and finally 1 row = 1 element in R^n belonging to S^{n-1}
-#   my_matrix / apply(my_matrix, 1, norm_Eucl_vec)
-# }
-normalize_me = function(vec) {
-  # Normalize each row of a matrix
-  # The matrix consists of 1 row = 1 element in R^n
-  #            and finally 1 row = 1 element in R^n belonging to S^{n-1}
-  vec / c(norm_Eucl_vec(vec))
+normalize_me = function(A) {
+  # Normalize a point of R^n into the element of S^{n-1}
+  A / c(norm_Eucl_vec(A))
 }
 
 #############################################
@@ -47,7 +27,6 @@ great_circle_distance = function(A, B) {
   }
   acos(Lambda)
 }
-
 ################################################################################
 # Derivative of the action of B on A on the sphere (see rotated for more info) #
 ################################################################################
@@ -70,7 +49,7 @@ deriv_rotated = function(A, B) {
   return(B_prim)
   # Explanation (read explanation of `rotated` function first):
   # Here we know the rotation of distance t is cos(t) * A + sin(t) * B_prim
-  # When t --> 0 we go rotated(A,B,0)=A
+  # When t --> 0 we go rotated(A, B, 0)=A
   # So the derivative is the limit in 0 of (rotated(A,B,t)-A)/t which is B_prim
 }
 
@@ -132,84 +111,3 @@ if(!all(round(rotated(A, B, pi) - (-A), 10) == 0)) {
   stop("rotated with t=pi does not give the opposite point")
 }
 rm(my_matrix, A, B, theta, line_from_A_to_A_by_B)
-# plot(t(apply(line_from_A_to_B, 1, latlong_func)) * 360 / (2*pi), xlim = c(-30, 30))
-
-###################
-# Plotting on S^2 #
-###################
-plot_sphere = function() {
-  # https://stackoverflow.com/questions/34539268
-  spheres3d(0, 0, 0, lit=FALSE, color="white")
-  spheres3d(0, 0, 0, radius=1.01, lit=FALSE, color="black", front="lines")
-}
-
-plot_path_on_sphere = function(traj, col = "black") {
-  x <- traj[,1]
-  y <- traj[,2]
-  z <- traj[,3]
-  spheres3d(x, y, z,col = col,radius = 0.02)
-}
-
-plot_point_on_sphere = function(A, col = "red", radius = 0.1) {
-  spheres3d(A[1], A[2], A[3], col = col, radius = radius)
-}
-
-if(debug) {
-  my_matrix = sample_surface_sphere(n_elem = 2, dim_S = 2, seed = 1234)
-  A = my_matrix[1,]
-  B = my_matrix[2,]
-  t_max = great_circle_distance(A, B) / 2  # t_max = 2*pi
-  theta = seq(from = 0, to = t_max, length.out = 100)
-  line_from_A_to_B = t(sapply(theta, function(t) {rotated(A, B, t)}))
-  plot_sphere()
-  plot_path_on_sphere(line_from_A_to_B)
-  plot_point_on_sphere(A, "red")
-  plot_point_on_sphere(B, "blue")
-  rm(my_matrix, A, B, t_max, theta, line_from_A_to_B)
-}
-
-#######################################################################
-# Can help to understand but not used in main code and only for n = 3 #
-#######################################################################
-latlong_func = function(xyz) {
-  # Convert from cartesian to long/lat (geographic system)
-  # https://en.wikipedia.org/wiki/N-vector
-  x = xyz[1]
-  y = xyz[2]
-  z = xyz[3]
-  lat = atan2(z, sqrt(x^2 + y^2))
-  long = atan2(y, x)
-  return(c(lat, long))
-}
-
-xyz_func = function(latlong) {
-  # Convert from long/lat to cartesian (geographic system)
-  # https://en.wikipedia.org/wiki/N-vector
-  lat = latlong[1]
-  long = latlong[2]
-  x = cos(lat) * cos(long)
-  y = cos(lat) * sin(long)
-  z = sin(lat)
-  return(c(x, y, z))
-}
-
-my_matrix = sample_surface_sphere(n_elem = 2, dim_S = 2, seed = 1234)
-my_matrix_converted = t(apply(my_matrix, 1, latlong_func))
-my_matrix_converted_converted = t(apply(my_matrix_converted, 1, xyz_func))
-if(sum(round(my_matrix_converted_converted - my_matrix, 10)) != 0) {
-  stop("Converting a point to coordinates and going back does not give original point")
-}
-rm(my_matrix, my_matrix_converted, my_matrix_converted_converted)
-
-# xyz_func_gen = function(latlong) {
-#   # Convert from long/lat to cartesian for dimension > 3 (geographic system)
-#   # Not tested.
-#   # https://fr.wikipedia.org/wiki/Coordonn%C3%A9es_sph%C3%A9riques#G%C3%A9n%C3%A9ralisation_en_dimension_n
-#   # generalize geographic coordinates
-#   # lat1, lat2, lat3 ... lat(n-1) long
-#   sin_latlong = c(sin(latlong), 1)
-#   prod_cos_latlong = c(1, cumprod(cos(latlong)))
-#   x = rev(prod_cos_latlong * sin_latlong)
-#   return(x)
-# }
-rm(latlong_func, xyz_func)

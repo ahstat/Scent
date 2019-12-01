@@ -1,11 +1,37 @@
-deriv_rotated_array = function(my_matrix) {
-  deriv_M = array(NA, dim = c(nrow(my_matrix), nrow(my_matrix), ncol(my_matrix)))
-  for(i in 1:(nrow(my_matrix))) {
-    for(j in (1:nrow(my_matrix))[-i]) {
-      deriv_M[i,j,] = deriv_rotated(my_matrix[i,], my_matrix[j,])
-    }
-  }
-  return(deriv_M)
+radius = 0.05
+
+###################
+# Plotting on S^2 #
+###################
+plot_sphere = function() {
+  # https://stackoverflow.com/questions/34539268
+  spheres3d(0, 0, 0, lit=FALSE, color="white")
+  spheres3d(0, 0, 0, radius=1.01, lit=FALSE, color="black", front="lines")
+}
+
+plot_path_on_sphere = function(traj, col = "black") {
+  x <- traj[,1]
+  y <- traj[,2]
+  z <- traj[,3]
+  spheres3d(x, y, z,col = col,radius = 0.02)
+}
+
+plot_point_on_sphere = function(A, col = "red", radius = 0.1) {
+  spheres3d(A[1], A[2], A[3], col = col, radius = radius)
+}
+
+if(debug) {
+  my_matrix = sample_surface_sphere(n_elem = 2, dim_S = 2, seed = 1234)
+  A = my_matrix[1,]
+  B = my_matrix[2,]
+  t_max = great_circle_distance(A, B) / 2  # t_max = 2*pi
+  theta = seq(from = 0, to = t_max, length.out = 100)
+  line_from_A_to_B = t(sapply(theta, function(t) {rotated(A, B, t)}))
+  plot_sphere()
+  plot_path_on_sphere(line_from_A_to_B)
+  plot_point_on_sphere(A, "red")
+  plot_point_on_sphere(B, "blue")
+  rm(my_matrix, A, B, t_max, theta, line_from_A_to_B)
 }
 
 segment_from_i_to_j = function(i = 1, j = 2, my_matrix, my_matrix_deriv) {
@@ -49,15 +75,6 @@ plot_all_tangent_from_i = function(i, my_matrix, my_matrix_deriv, weighted = FAL
     traj_tangent = t(sapply(t_vec, function(t) {my_matrix[i,] + t * W[j] * my_matrix_deriv[i,j,]}))
     plot_path_on_sphere(traj_tangent, "lightgray")
   }
-}
-
-get_mean_tangent_with_weights_from_i = function(i, dir_points, my_matrix_derivdist, my_matrix_deriv) {
-  N = nrow(my_matrix_derivdist)
-  each_tangent = sapply(1:N, function(j){dir_points[j]*my_matrix_derivdist[i,j]*my_matrix_deriv[i,j,]})
-  each_tangent = each_tangent[,-i]
-  mean_tangent = apply(each_tangent, 1, sum)
-  mean_tangent = mean_tangent / N
-  return(mean_tangent)
 }
 
 plot_mean_tangent_with_weights_from_i = function(i, dir_points, my_matrix_derivdist, my_matrix_deriv, my_matrix) {

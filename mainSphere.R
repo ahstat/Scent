@@ -2,11 +2,13 @@ library(rgl)
 rm(list = ls())
 setwd("~/Documents/GitHub/scent")
 debug = FALSE
-radius = 0.05
-source("helpersSphere/helpers.R")
-source("helpersSphere/move.R")
+source("helpersSphere/sample_Sn.R")
+source("helpersSphere/measure_Sn.R")
+source("helpersSphere/plots_S2.R")
+# source("helpersSphere/misc_S2_to_latlong.R")
+# source("helpersSphere/blabla.R")
 source("helpersSphere/tests.R")
-source("helpersSphere/helpers2.R")
+source("helpersSphere/move.R")
 
 # test1(seed = 1, t_max = "line")
 # test1(seed = 1, t_max = "segment")
