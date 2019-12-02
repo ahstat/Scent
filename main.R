@@ -9,8 +9,6 @@ source("helpers/plots_S2.R")
 source("helpers/tests.R")
 source("helpers/move.R")
 
-#cool
-
 # test1(seed = 1, t_max = "line")
 # test1(seed = 1, t_max = "segment")
 # test1(seed = 1, t_max = "semisegment")
@@ -20,8 +18,10 @@ source("helpers/move.R")
 
 seed = 1
 my_matrix = sample_surface_sphere(n_elem = 3, dim_S = 2, seed = seed)
+#types = rep(+1, nrow(my_matrix)) # whether acscent and descent on the global mixture function
+types = c(+1, -1, -1)
 density_types = rep(+1, nrow(my_matrix)) # -1 will give you negative density for this particle
-types = rep(+1, nrow(my_matrix)) # whether acscent and descent on the global mixture function
+# density_types = c(-1,1,1)
 
 ## Change points
 #A = c(0, 1, 0)
@@ -35,28 +35,35 @@ my_matrix[2,] = B
 my_matrix[3,] = C
 ## End custom changes
 
-my_matrix_derivdist = matrix_of_D_distances(my_matrix, Df)
-my_matrix_deriv = deriv_rotated_array(my_matrix)
-
 i = 1
+
+my_matrix_list = list()
+my_matrix_list[[1]] = my_matrix
+for(k in 2:100) {
+  my_matrix_pushed = push(my_matrix_list[[k-1]], Df, densitypes, types, alpha = 0.33) 
+  my_matrix_list[[k]] = my_matrix_pushed
+}
+
 plot_sphere()
-#plot_all_paths_from_i(i, my_matrix, my_matrix_deriv)
+for(k in 1:100) {
+  plot_all_points(i, my_matrix_list[[k]])
+}
+
+####### need to check, then continue
+
+
+
+
 plot_all_points(i, my_matrix)
+plot_all_points(i, my_matrix_pushed)
+
+#plot_all_paths_from_i(i, my_matrix, my_matrix_deriv)
 #plot_all_prim_from_i(i, my_matrix_deriv)
-plot_all_tangent_from_i(i, my_matrix, my_matrix_deriv, weighted = TRUE,
-                       density_types, my_matrix_derivdist)
-M_logS_weighted = matrix_of_weighted_contribution(my_matrix, Df)
-density_types = c(-1,1,1)
-M_logS_weighted = sweep(M_logS_weighted, 2, density_types, '*')
 plot_all_tangent_from_i_new(i, my_matrix, M_logS_weighted/nrow(my_matrix))
-
-
-mean_action_on_A_from_others = apply(M_logS_weighted[1,,], 1, mean)
 
 for(i in 1:nrow(my_matrix)) {
   plot_mean_tangent_with_weights_from_i_new(i, my_matrix, M_logS_weighted)
 }
-
 
 
 plot_point_on_sphere(G, "goldenrod", radius)
@@ -73,9 +80,4 @@ t = sqrt(sum((mean_tangent)^2))
 G = rotated_from_derivative(my_matrix[i,], normalize_me(mean_tangent), t)
 great_circle_distance(G, my_matrix[i,])
 plot_point_on_sphere(G, "goldenrod", radius)
-
-
-# do tests:
-# points close to the element / and same number of points at distance pi/2
-
 
