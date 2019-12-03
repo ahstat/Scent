@@ -5,79 +5,76 @@ debug = FALSE
 source("helpers/sample_Sn.R")
 source("helpers/measure_Sn.R")
 source("helpers/measure_tangent_Sn.R")
-source("helpers/plots_S2.R")
 source("helpers/tests.R")
 source("helpers/move.R")
+source("helpers/plots_S2.R")
 
 # test1(seed = 1, t_max = "line")
 # test1(seed = 1, t_max = "segment")
 # test1(seed = 1, t_max = "semisegment")
 # test2()
-# test3(seed = 1)
+# test4()
 
+test5 = function(seed = 1) {
+  seed = 1
+  
+  my_matrix = sample_surface_sphere(n_elem = 3, dim_S = 2, seed = seed)
+  #types = rep(+1, nrow(my_matrix)) 
+  types = rep(+1, nrow(my_matrix)) # whether ascent and descent on the global mixture function
+  densitypes = rep(+1, nrow(my_matrix)) # whether common and anti density
+  alpha = 1
+  
+  ## Change points
+  A = c(0, 1, 0)
+  B = normalize_me(c(0, 0.9, 0.5))
+  C = c(1, 0, 0)
+  my_matrix[1,] = A
+  my_matrix[2,] = B
+  my_matrix[3,] = C
+  ## End custom changes
+  colA = "red"
+  colB = "blue"
+  colC = "green"
+  
+  plot_sphere()
+  plot_point(A, colA)
+  plot_point(B, colB)
+  plot_point(C, colC)
+  
+  # row = point 0 of the tangent space
+  # col = outside point as seen on the tangent
+  M1 = matrix1_of_weighted_contribution(my_matrix, Df)
+  Bprim_onA = M1[1, 2,]
+  Cprim_onA = M1[1, 3,]
+  Aprim_onB = M1[2, 1,]
+  Cprim_onB = M1[2, 3,]
+  Aprim_onC = M1[3, 1,]
+  Bprim_onC = M1[3, 2,]
+  
+  great_circle_distance(A, C)
+  great_circle_distance(B, C)
+  
+  plot_segment_R_n(A, A + Bprim_onA, col = colB)
+  plot_segment_R_n(A, A + Cprim_onA, col = colC)
+  plot_segment_R_n(B, B + Aprim_onB, col = colA)
+  plot_segment_R_n(B, B + Cprim_onB, col = colC)
+  plot_segment_R_n(C, C + Aprim_onC, col = colA)
+  plot_segment_R_n(C, C + Bprim_onC, col = colB)
+  plot_segment_S_n(A, B)
+  plot_segment_S_n(A, C)
+  plot_segment_S_n(B, C)
+  
+  # readline(prompt="Press [enter] to continue")
+  # plot_all_points(i, my_matrix)
+  # readline(prompt="Press [enter] to continue")
+  # plot_all_points(i, my_matrix_pushed)
 
-seed = 1
-my_matrix = sample_surface_sphere(n_elem = 3, dim_S = 2, seed = seed)
-#types = rep(+1, nrow(my_matrix)) # whether acscent and descent on the global mixture function
-types = c(+1, -1, -1)
-density_types = rep(+1, nrow(my_matrix)) # -1 will give you negative density for this particle
-# density_types = c(-1,1,1)
-
-## Change points
-#A = c(0, 1, 0)
-#B = c(0, 0.9, 0.5); B = B / sqrt(sum(B^2))
-#C = c(0.5, 0.9, 0); C = C / sqrt(sum(C^2))
-A = c(0, 1, 0)
-B = c(0, 0.9, 0.5); B = B / sqrt(sum(B^2))
-C = c(1, 0, 0)
-my_matrix[1,] = A
-my_matrix[2,] = B
-my_matrix[3,] = C
-## End custom changes
-
-i = 1
-
-my_matrix_list = list()
-my_matrix_list[[1]] = my_matrix
-for(k in 2:100) {
-  my_matrix_pushed = push(my_matrix_list[[k-1]], Df, densitypes, types, alpha = 0.33) 
-  my_matrix_list[[k]] = my_matrix_pushed
+  
+  M2 = matrix2_of_weighted_contribution_with_densitypes(M1, densitypes)
+  M3 = matrix3_of_mean_action(M2)
+  M4 = matrix4_of_mean_action_with_types(M3, types, alpha)
+  my_matrix_pushed = matrix5_of_mean_actions_with_types_on_sphere(my_matrix, M4)
+  
 }
 
-plot_sphere()
-for(k in 1:100) {
-  plot_all_points(i, my_matrix_list[[k]])
-}
-
-####### need to check, then continue
-
-
-
-
-plot_all_points(i, my_matrix)
-plot_all_points(i, my_matrix_pushed)
-
-#plot_all_paths_from_i(i, my_matrix, my_matrix_deriv)
-#plot_all_prim_from_i(i, my_matrix_deriv)
-plot_all_tangent_from_i_new(i, my_matrix, M_logS_weighted/nrow(my_matrix))
-
-for(i in 1:nrow(my_matrix)) {
-  plot_mean_tangent_with_weights_from_i_new(i, my_matrix, M_logS_weighted)
-}
-
-
-plot_point_on_sphere(G, "goldenrod", radius)
-
-
-
-apply(M_logS_weighted[i,,], 1, mean)
-
-
-plot_mean_tangent_with_weights_from_i(i, density_types, my_matrix_derivdist, my_matrix_deriv, my_matrix)
-
-mean_tangent = get_mean_tangent_with_weights_from_i(i, density_types, my_matrix_derivdist, my_matrix_deriv)
-t = sqrt(sum((mean_tangent)^2))
-G = rotated_from_derivative(my_matrix[i,], normalize_me(mean_tangent), t)
-great_circle_distance(G, my_matrix[i,])
-plot_point_on_sphere(G, "goldenrod", radius)
-
+test5()

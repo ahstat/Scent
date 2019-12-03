@@ -60,8 +60,3 @@ ExpS = function(A, B_on_tanA) {
 # 
 # theta = great_circle_distance(A, B)
 # Df(theta)
-
-
-
-
-

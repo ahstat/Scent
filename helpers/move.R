@@ -14,7 +14,7 @@ matrix1_of_weighted_contribution = function(my_matrix, Df) {
 }
 
 matrix2_of_weighted_contribution_with_densitypes = function(M_logS_weighted, densitypes) {
-  M_logS_weighted_with_densitypes = sweep(M_logS_weighted, 2, density_types, '*')
+  M_logS_weighted_with_densitypes = sweep(M_logS_weighted, 2, densitypes, '*')
   return(M_logS_weighted_with_densitypes)
   # M_logS_weighted_with_densitypes[A, B,] = densitype+weighted point B seen on the tangent space of A
 }
@@ -53,59 +53,3 @@ push = function(my_matrix, Df, densitypes, types, alpha = 1) {
   M5 = matrix5_of_mean_actions_with_types_on_sphere(my_matrix, M4)
   return(M5)
 }
-
-
-
-
-
-
-# matrix_of_distances = function(my_matrix) {
-#   M = matrix(NA, nrow = nrow(my_matrix), ncol = nrow(my_matrix))
-#   for(i in 1:(nrow(my_matrix)-1)) {
-#     for(j in (i+1):nrow(my_matrix)) {
-#       M[i, j] = great_circle_distance(my_matrix[i,], my_matrix[j,])
-#     }
-#   }
-#   return(M)
-# }
-# 
-# matrix_of_D_distances = function(my_matrix, Df) {
-#   M = matrix_of_distances(my_matrix)
-#   M[] <- vapply(M, Df, numeric(1))
-#   M[lower.tri(M)] = t(M)[lower.tri(M)]
-#   return(M)
-# }
-
-# my_matrix = sample_surface_sphere(n_elem = 3, dim_S = 2, seed = 1234)
-# plot(sort(matrix_of_distances(my_matrix)), ylim = c(0, pi))
-# plot((abs(sort(matrix_of_D_distances(my_matrix, Df)))))
-# M = matrix_of_D_distances(my_matrix, Df)
-# A = my_matrix[1,]
-# B = my_matrix[2,]
-# C = my_matrix[3,]
-# rotated(A, B, M[1,2])
-# rotated(A, C, M[1,3])
-# 
-# B_prim = deriv_rotated(A, B)
-# C_prim = deriv_rotated(A, C)
-# rotated_from_derivative(A, B_prim, M[1,2])
-# rotated_from_derivative(A, C_prim, M[1,3])
-
-# deriv_rotated_array = function(my_matrix) {
-#   deriv_M = array(NA, dim = c(nrow(my_matrix), nrow(my_matrix), ncol(my_matrix)))
-#   for(i in 1:(nrow(my_matrix))) {
-#     for(j in (1:nrow(my_matrix))[-i]) {
-#       deriv_M[i,j,] = deriv_rotated(my_matrix[i,], my_matrix[j,])
-#     }
-#   }
-#   return(deriv_M)
-# }
-# 
-# get_mean_tangent_with_weights_from_i = function(i, dir_points, my_matrix_derivdist, my_matrix_deriv) {
-#   N = nrow(my_matrix_derivdist)
-#   each_tangent = sapply(1:N, function(j){dir_points[j]*my_matrix_derivdist[i,j]*my_matrix_deriv[i,j,]})
-#   each_tangent = each_tangent[,-i]
-#   mean_tangent = apply(each_tangent, 1, sum)
-#   mean_tangent = mean_tangent / N
-#   return(mean_tangent)
-# }
