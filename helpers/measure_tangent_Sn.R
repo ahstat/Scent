@@ -45,7 +45,11 @@ ExpS = function(A, B_on_tanA) {
   # Convert a point on the tangent space in A to a point B of S^{n-1}
   # From http://people.csail.mit.edu/jstraub/download/straub2015dptgmm.pdf
   norm_B_on_tanA = c(norm_Eucl_vec(B_on_tanA))
-  B = A * cos(norm_B_on_tanA) + (B_on_tanA / norm_B_on_tanA) * sin(norm_B_on_tanA)
+  if(norm_B_on_tanA != 0) {
+    B = A * cos(norm_B_on_tanA) + (B_on_tanA / norm_B_on_tanA) * sin(norm_B_on_tanA)
+  } else {
+    B = A
+  }
   return(B)
 }
 

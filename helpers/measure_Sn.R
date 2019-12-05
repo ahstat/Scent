@@ -24,6 +24,9 @@ great_circle_distance = function(A, B) {
   if(Lambda > 1) {
     # case of numerical problem, when Lambda = 1.00001
     return(0)
+  } else if(Lambda < -1) {
+    # case of numerical problem, when Lambda = -1.00001
+    return(pi)
   }
   acos(Lambda)
 }
