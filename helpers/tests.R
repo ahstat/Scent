@@ -249,3 +249,33 @@ test5 = function(seed = 0, types = c(1, 1, 1), densitypes = c(1, 1, 1), alpha = 
   plot_point(mean_onB_sphere, paste0("dark", colB))
   plot_point(mean_onC_sphere, paste0("dark", colC))
 }
+
+test6 = function(first_one = TRUE) {
+  n_elem = 3
+  dim_S = 1
+  my_matrix = sample_surface_sphere(n_elem, dim_S)
+  A = c(Re(exp(1i*0)), Im(exp(1i*0)))
+  B = c(Re(exp(1i*(2/3)*pi)), Im(exp(1i*(2/3)*pi)))
+  C = c(Re(exp(-1i*(2/3)*pi)), Im(exp(-1i*(2/3)*pi)))
+  my_matrix[1,] = A
+  my_matrix[2,] = B
+  my_matrix[3,] = C
+  
+  if(first_one) {
+    types = c(1, 1, -1)
+    densitypes = c(1, -1, -1)
+  } else {
+    # Second one
+    types = c(-1, -1, -1)
+    densitypes = c(-1, 1, -1)
+  }
+  
+  alpha = 0.1
+  N = 100
+  Evolution = get_evol(my_matrix, N, Df, densitypes, types, alpha)
+  distEvolution = dist_evol(Evolution)
+  plot_dist_evol(distEvolution)
+  plot_evolution(Evolution, 1, N)
+  
+  distEvolution[,,dim(distEvolution)[3]]
+}

@@ -51,5 +51,8 @@ push = function(my_matrix, Df, densitypes, types, alpha = 1) {
   M3 = matrix3_of_mean_action(M2)
   M4 = matrix4_of_mean_action_with_types(M3, types, alpha)
   M5 = matrix5_of_mean_actions_with_types_on_sphere(my_matrix, M4)
-  return(M5)
+  # For preventing numerical errors:
+  M6 = t(apply(M5, 1, normalize_me))
+  # Check: apply(M6, 1, norm_Eucl_vec)
+  return(M6)
 }

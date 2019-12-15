@@ -42,4 +42,3 @@ rm(my_matrix, my_matrix_converted, my_matrix_converted_converted)
 #   x = rev(prod_cos_latlong * sin_latlong)
 #   return(x)
 # }
-rm(latlong_func, xyz_func)

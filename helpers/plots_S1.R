@@ -1,10 +1,10 @@
 ###################
 # Plotting on S^1 #
 ###################
-plot_circle = function() {
+plot_circle = function(...) {
   # https://stackoverflow.com/questions/22265704/drawing-circle-in-r/22266006
   # initialize a plot
-  plot(c(-1, 1), c(-1, 1), type = "n", asp = 1)
+  plot(c(-1, 1), c(-1, 1), type = "n", asp = 1, ...)
   
   # prepare "circle data"
   radius <- 1
