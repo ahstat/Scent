@@ -1,6 +1,7 @@
 library(rgl)
 library(data.table)
 library(ggplot2)
+library(dplyr)
 rm(list = ls())
 setwd("~/Documents/GitHub/scent")
 debug = FALSE
@@ -30,10 +31,16 @@ source("helpers/tests.R")
 # my_matrix = square_on_Sn(dim_S = 2)
 # my_matrix = vingtquatrecell()
 #my_matrix = unif_circle(n_elem = 10)
-my_matrix = matrix(NA, nrow = 2, ncol = 3)
+my_matrix = matrix(NA, nrow = 4, ncol = 3)
 my_matrix[1,] = c(0,-1,0)
-the_higher_the_closer = 4
-my_matrix[2,] = normalize_me(c(0,-1,1/the_higher_the_closer))
+# the_higher_the_closer = 4
+# my_matrix[2,] = normalize_me(c(0,-1,1/the_higher_the_closer))
+my_matrix[2,] = rotated(my_matrix[1,], normalize_me(c(0,-1,1)), pi/16)
+
+my_matrix[3,] = c(-1,0,0)
+#my_matrix[4,] = normalize_me(c(-1,0,1/the_higher_the_closer))
+my_matrix[4,] = rotated(my_matrix[3,], normalize_me(c(-1,0,1)), pi/16)
+
 plot_mymatrix(my_matrix)
 
 ## Define Df
@@ -41,29 +48,36 @@ plot_mymatrix(my_matrix)
 #   -sin(3*angle)
 # }
 Df_current = function(angle) {
-  if(abs(angle) < pi/4) {
-    -sin(4*angle)
+  if(abs(angle) < pi/2) {
+    -sin(2*angle)
   } else {
     0
   }
 }#Df
 
+
 ## Other parameters
-N = 1000
-alpha = 0.1
+N = 50000
+alpha = 0.003
 n_elem = nrow(my_matrix)
 vectypes = combin(n_elem) # if > 10, need to see how to remove some
 #vectypes = combin(n_elem, types = "type")
+vectypes = vectypes %>% filter(type1 == -1, densitype1 == 1, type2 == 1, densitype2 == 1)
 
 ## Evolution
 velocities = list()
 max_val =  nrow(vectypes)
+#vectypes[15,] # as euclidian: c(-1, 1, -1, 1), and densitype==1
+# other good is vectypes[2,]:  # c(-1, 1, 1, -1) and densitype = c(1,1,-1,-1)
 for(i in 1:max_val) {
+  i = 15
   print(paste0(i, "/", nrow(vectypes)))
   Evolution = evol(my_matrix, i, vectypes, N, Df_current, alpha)
-  plot_evolution(Evolution, main = i)
   vel = approx_velocity(Evolution)
   velocities[[i]] = data.frame(expe = as.character(i), step = 2:length(vel), vel = vel[-1])
+  plot(vel)
+  plot_evolution(Evolution, 1, 18000, 300, main = i)
+  #plot_evolution(Evolution, 100, 100, main = i)
   # distEvolution = dist_evol(Evolution)
   # approx_velocity(distEvolution)
 }
@@ -115,7 +129,7 @@ for(i in 1:max_val) {
   Evolution = evol(my_matrix, i, vectypes, N)
   vel = approx_velocity(Evolution)
   velocities[[i]] = data.frame(expe = as.character(i), step = 2:length(vel), vel = vel[-1])
-
+  
   distEvolution = dist_evol(Evolution)
   approx_velocity(distEvolution)
 }

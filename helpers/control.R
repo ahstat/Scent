@@ -78,19 +78,22 @@ combin = function(n_elem, types = c("type", "densitype"), unitype = c(-1, 1)) {
   } else {
     stop("length(types) must be of length 1 or 2")
   }
+  colnames(vectypes) = gsub(" ", "", colnames(vectypes))
   return(vectypes)
+}
+
+evol = function(my_matrix, i, vectypes, N, Df, alpha = 0.1) {
+  types = as.numeric(vectypes[i, c(paste0("type", 1:nrow(my_matrix)))])
+  densitypes = as.numeric(vectypes[i, c(paste0("densitype", 1:nrow(my_matrix)))])
+  Evolution = get_evol(my_matrix, N, Df, densitypes, types, alpha)
+  return(Evolution)
 }
 
 evol_and_plot = function(my_matrix,
                          i, vectypes, N, alpha = 0.1, 
                          plot_dist = TRUE, plot_evol = TRUE, plot_evol_proj = FALSE,
                          savepng = FALSE) {
-  step_min = max(N/2, N - 100)
-  step_max = N
-  
-  types = as.numeric(vectypes[i, c(paste0("type", 1:nrow(my_matrix)))])
-  densitypes = as.numeric(vectypes[i, c(paste0("densitype", 1:nrow(my_matrix)))])
-  Evolution = get_evol(my_matrix, N, Df, densitypes, types, alpha)
+  Evolution = evol(my_matrix, i, vectypes, N, Df, alpha)
   distEvolution = dist_evol(Evolution)
   
   print(paste0(i, "/", nrow(vectypes)))
@@ -106,11 +109,14 @@ evol_and_plot = function(my_matrix,
   }
   
   if(plot_evol) {
+    step_min = max(N/2, N - 100)
+    step_max = N
+    
     if(savepng) {
-      #png(paste0("plots/", i, ".png"))
+      png(paste0("plots/", i, ".png"))
       main = i #paste0(names(vectypes[i,]), ": ", vectypes[i,], " / ", collapse = "")
       plot_evolution(Evolution, step_min = step_min, step_max = step_min, main = main)
-      #dev.off()
+      dev.off()
     } else {
       main = i #paste0(names(vectypes[i,]), ": ", vectypes[i,], " / ", collapse = "")
       plot_evolution(Evolution, step_min = step_min, step_max = step_min, main = main)
@@ -132,4 +138,14 @@ pseudo_random_number = function() {
 
 rspin = function(n_elem) {
   2 * rbinom(n_elem, 1, prob = 1/2) - 1
+}
+
+approx_velocity = function(Evolution) {
+  # velocity on R^n (not on S^n), ok for seeing convergence or not
+  N = dim(Evolution)[3]
+  velocity = rep(NA, N)
+  for(i in 2:N) {
+    velocity[i] = sum(apply(Evolution[,,i] - Evolution[,,i-1], 1, function(x){sqrt(sum(x^2, na.rm = TRUE))}))
+  }
+  return(velocity)
 }
