@@ -16,8 +16,8 @@ test1 = function(seed = 1, t_max = "segment") {
   
   plot_sphere()
   plot_path_on_sphere(line_from_A_to_B)
-  plot_point(A, "red")
-  plot_point(B, "blue")
+  plot_point_on_sphere(A, "red")
+  plot_point_on_sphere(B, "blue")
 }
 
 test2 = function(t_max = "segment") {
@@ -38,18 +38,18 @@ test2 = function(t_max = "segment") {
   
   plot_sphere()
   plot_path_on_sphere(line_from_A_to_B)
-  plot_point(A, "red")
-  plot_point(B, "blue")
+  plot_point_on_sphere(A, "red")
+  plot_point_on_sphere(B, "blue")
   
   Lambda = c(crossprod(A, B))
   B_prim = deriv_rotated(A, B) # necessary to live on the tangent space then
-  plot_point(B_prim, "green")
+  plot_point_on_sphere(B_prim, "green")
   
   Tangent = list()
   t_vec = seq(from = 0.1, to = 1, by = 0.1)
   for(i in 1:length(t_vec)) {
     Tangent[[i]] = A + t_vec[i] * B_prim
-    plot_point(Tangent[[i]], "orange")
+    plot_point_on_sphere(Tangent[[i]], "orange")
   }
 }
 
@@ -84,12 +84,11 @@ test4 = function(seed = 1) {
   plot_sphere()
   for(k in 1:N) {
     print(k)
-    plot_all_points(i, my_matrix_list[[k]])
+    plot_all_points_on_sphere(i, my_matrix_list[[k]])
   }
 }
 
 test5 = function(seed = 0, types = c(1, 1, 1), densitypes = c(1, 1, 1), alpha = 1) {
-  
   my_matrix = sample_surface_sphere(n_elem = 3, dim_S = 2, seed = seed)
   # types = rep(+1, nrow(my_matrix)) # whether ascent and descent on the global mixture function
   # densitypes = rep(+1, nrow(my_matrix)) # whether common and anti density
@@ -121,9 +120,9 @@ test5 = function(seed = 0, types = c(1, 1, 1), densitypes = c(1, 1, 1), alpha = 
   colC = "green"
   
   plot_sphere()
-  plot_point(A, colA)
-  plot_point(B, colB)
-  plot_point(C, colC)
+  plot_point_on_sphere(A, colA)
+  plot_point_on_sphere(B, colB)
+  plot_point_on_sphere(C, colC)
   
   # row = point 0 of the tangent space
   # col = outside point as seen on the tangent
@@ -157,9 +156,9 @@ test5 = function(seed = 0, types = c(1, 1, 1), densitypes = c(1, 1, 1), alpha = 
   Aprim_onC = M2[3, 1,]
   Bprim_onC = M2[3, 2,]
   plot_sphere()
-  plot_point(A, colA)
-  plot_point(B, colB)
-  plot_point(C, colC)  
+  plot_point_on_sphere(A, colA)
+  plot_point_on_sphere(B, colB)
+  plot_point_on_sphere(C, colC)  
   plot_segment_R_n(A, A + Bprim_onA, col = colB)
   plot_segment_R_n(A, A + Cprim_onA, col = colC)
   plot_segment_R_n(B, B + Aprim_onB, col = colA)
@@ -181,9 +180,9 @@ test5 = function(seed = 0, types = c(1, 1, 1), densitypes = c(1, 1, 1), alpha = 
   mean_onB = M3[2,]
   mean_onC = M3[3,]
   plot_sphere()
-  plot_point(A, colA)
-  plot_point(B, colB)
-  plot_point(C, colC)
+  plot_point_on_sphere(A, colA)
+  plot_point_on_sphere(B, colB)
+  plot_point_on_sphere(C, colC)
   plot_segment_R_n(A, A + Bprim_onA, col = colB)
   plot_segment_R_n(A, A + Cprim_onA, col = colC)
   plot_segment_R_n(B, B + Aprim_onB, col = colA)
@@ -209,9 +208,9 @@ test5 = function(seed = 0, types = c(1, 1, 1), densitypes = c(1, 1, 1), alpha = 
   mean_onB = M4[2,]
   mean_onC = M4[3,]
   plot_sphere()
-  plot_point(A, colA)
-  plot_point(B, colB)
-  plot_point(C, colC)
+  plot_point_on_sphere(A, colA)
+  plot_point_on_sphere(B, colB)
+  plot_point_on_sphere(C, colC)
   plot_segment_R_n(A, A + Bprim_onA, col = colB)
   plot_segment_R_n(A, A + Cprim_onA, col = colC)
   plot_segment_R_n(B, B + Aprim_onB, col = colA)
@@ -233,9 +232,9 @@ test5 = function(seed = 0, types = c(1, 1, 1), densitypes = c(1, 1, 1), alpha = 
   mean_onB_sphere = my_matrix_pushed[2,]
   mean_onC_sphere = my_matrix_pushed[3,]
   plot_sphere()
-  plot_point(A, colA)
-  plot_point(B, colB)
-  plot_point(C, colC)
+  plot_point_on_sphere(A, colA)
+  plot_point_on_sphere(B, colB)
+  plot_point_on_sphere(C, colC)
   plot_segment_R_n(A, A + mean_onA, col = colA)
   plot_segment_R_n(B, B + mean_onB, col = colB)
   plot_segment_R_n(C, C + mean_onC, col = colC)
@@ -245,9 +244,9 @@ test5 = function(seed = 0, types = c(1, 1, 1), densitypes = c(1, 1, 1), alpha = 
   plot_segment_S_n(A, B)
   plot_segment_S_n(A, C)
   plot_segment_S_n(B, C)
-  plot_point(mean_onA_sphere, paste0("dark", colA))
-  plot_point(mean_onB_sphere, paste0("dark", colB))
-  plot_point(mean_onC_sphere, paste0("dark", colC))
+  plot_point_on_sphere(mean_onA_sphere, paste0("dark", colA))
+  plot_point_on_sphere(mean_onB_sphere, paste0("dark", colB))
+  plot_point_on_sphere(mean_onC_sphere, paste0("dark", colC))
 }
 
 test6 = function(first_one = TRUE) {
@@ -278,4 +277,42 @@ test6 = function(first_one = TRUE) {
   plot_evolution(Evolution, 1, N)
   
   distEvolution[,,dim(distEvolution)[3]]
+}
+
+test7 = function() {
+  set.seed(1)
+  my_matrix = tetrahedron_on_sphere()
+  n_elem = nrow(my_matrix)
+  alpha = 0.1
+  N = 1000
+  
+  ## Only one selected
+  #types = rep(+1, n_elem)
+  types = rspin(n_elem)
+  #densitypes = rep(+1, n_elem)
+  densitypes = rspin(n_elem)
+  
+  Evolution = get_evol(my_matrix, N, Df, densitypes, types, alpha)
+  distEvolution = dist_evol(Evolution)
+  plot_dist_evol(distEvolution)
+  plot_evolution(Evolution, step_min = N - 20, step_max = N)
+}
+
+test8 = function(dimshape = "sphere") {
+  if(dimshape == "sphere") {
+    my_matrix = tetrahedron_on_sphere()
+  } else if(dimshape == "circle") {
+    n_elem = 4
+    my_matrix = unif_circle(n_elem)
+  }
+  n_elem = nrow(my_matrix)
+  N = 1000
+  
+  ## All combination of types and densitypes selected
+  vectypes = combin(n_elem)
+  for(i in 1:nrow(vectypes)) {
+    if(i < 10) {
+      evol_and_plot(my_matrix, i, vectypes, N)
+    }
+  }
 }

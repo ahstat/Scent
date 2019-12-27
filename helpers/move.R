@@ -56,3 +56,12 @@ push = function(my_matrix, Df, densitypes, types, alpha = 1) {
   # Check: apply(M6, 1, norm_Eucl_vec)
   return(M6)
 }
+
+get_evol = function(my_matrix, N, Df, densitypes, types, alpha) {
+  Evolution = array(NA, dim = c(dim(my_matrix), N))
+  Evolution[,,1] = my_matrix
+  for(i in 2:N) {
+    Evolution[,,i] = push(Evolution[,,i-1], Df, densitypes, types, alpha)
+  }
+  return(Evolution)
+}
