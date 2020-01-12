@@ -1,7 +1,9 @@
+# Sample of points on the sphere
+
 ###############################################################
 # Sample uniform distribution on the surface of a unit sphere #
 ###############################################################
-sample_surface_sphere = function(n_elem, dim_S = 2, seed = 1234) {
+sample_on_S = function(n_elem, dim_S = 2, seed = 1234) {
   # Pick n_elem points on S^{n-1} (20180501)
   # http://mathworld.wolfram.com/HyperspherePointPicking.html
   set.seed(seed)
@@ -14,7 +16,7 @@ sample_surface_sphere = function(n_elem, dim_S = 2, seed = 1234) {
 ##################################################
 # Regular at regular distance for the S^1 circle #
 ##################################################
-unif_circle = function(n_elem) {
+unif_on_S1 = function(n_elem) {
   vec = (1:n_elem)-1
   vecExp = exp(1i*vec*2*pi/n_elem)
   my_matrix = cbind(Re(vecExp), Im(vecExp))
@@ -24,11 +26,11 @@ unif_circle = function(n_elem) {
 #####################################
 # Regular tetrahedron on S^2 sphere #
 #####################################
-tetrahedron_on_sphere = function() {
+tetrahedron_on_S2 = function() {
   n_elem = 4
   dim_S = 2
   seed = 1
-  my_matrix = sample_surface_sphere(n_elem, dim_S, seed = seed)
+  my_matrix = sample_on_S(n_elem, dim_S, seed = seed)
   A = c( sqrt(8/9),          0, -1/3)
   B = c(-sqrt(2/9),  sqrt(2/3), -1/3)
   C = c(-sqrt(2/9), -sqrt(2/3), -1/3)
@@ -43,10 +45,10 @@ tetrahedron_on_sphere = function() {
 ##################################
 # Square, cube, hypercube on S^n #
 ##################################
-square_on_Sn = function(dim_S) {
+square_on_S = function(dim_S) {
   n = dim_S + 1
   n_elem = 2 * n
-  my_matrix = sample_surface_sphere(n_elem, dim_S, seed = 1)
+  my_matrix = sample_on_S(n_elem, dim_S, seed = 1)
   mat_minus = diag(n) * -1
   mat_plus = diag(n) * +1
   for(i in 1:n) {
@@ -59,8 +61,8 @@ square_on_Sn = function(dim_S) {
 ##################
 # 24-cell on S^3 #
 ##################
-vingtquatrecell = function() {
-  my_matrix = sample_surface_sphere(n_elem = 24, dim_S = 3, seed = 1)
+icositetrachore_on_S3 = function() {
+  my_matrix = sample_on_S(n_elem = 24, dim_S = 3, seed = 1)
   
   my_matrix[1,] =  c(-1, -1,  0,  0)
   my_matrix[2,] =  c(-1,  1,  0,  0)

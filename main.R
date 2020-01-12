@@ -3,15 +3,22 @@ library(data.table)
 library(ggplot2)
 rm(list = ls())
 setwd("~/Documents/GitHub/scent")
-debug = FALSE
-source("helpers/sample_Sn.R")
-source("helpers/measure_Sn.R")
-source("helpers/measure_tangent_Sn.R")
+source("helpers/measure_E.R")
+source("helpers/measure_H.R")
+source("helpers/measure_S.R")
+source("helpers/measure.R")
 source("helpers/move.R")
-source("helpers/plots_Sn.R")
+source("helpers/sample_S.R")
+
+# add R of the sphere
+# add ??? for the hyperbolic space
+
+source("helpers/plots.R")
 source("helpers/control.R")
 source("helpers/tests.R")
 
+
+debug = FALSE
 # test1(seed = 1, t_max = "line")
 # test1(seed = 1, t_max = "segment")
 # test1(seed = 1, t_max = "semisegment")
