@@ -22,7 +22,7 @@ plot_evolution_sphere = function(Evolution, step_min, step_max, step_by) {
   if(is.na(step_max)) {
     step_max = dim(Evolution)[3]
   }
-  
+
   plot_sphere()
   for(step in seq(from = step_min, to = step_max, by = step_by)){
     step = floor(step)
@@ -39,12 +39,12 @@ plot_evolution_sphere = function(Evolution, step_min, step_max, step_by) {
 
 plot_sphere = function() {
   # https://stackoverflow.com/questions/34539268
-  spheres3d(0, 0, 0, lit = FALSE, color = "white")
-  spheres3d(0, 0, 0, radius = 1.01, lit = FALSE, color = "black", front = "lines")
+  rgl::spheres3d(0, 0, 0, lit = FALSE, color = "white")
+  rgl::spheres3d(0, 0, 0, radius = 1.01, lit = FALSE, color = "black", front = "lines")
 }
 
 plot_point_on_sphere = function(A, col = "red", radius = 0.1) {
-  spheres3d(A[1], A[2], A[3], col = col, radius = radius)
+  rgl::spheres3d(A[1], A[2], A[3], col = col, radius = radius)
 }
 
 plot_path_on_sphere = function(traj, col = "black", radius = 0.02) {
@@ -52,22 +52,22 @@ plot_path_on_sphere = function(traj, col = "black", radius = 0.02) {
   x <- traj[,1]
   y <- traj[,2]
   z <- traj[,3]
-  spheres3d(x, y, z, col = col, radius = radius)
+  rgl::spheres3d(x, y, z, col = col, radius = radius)
 }
 
-if(debug) {
-  my_matrix = sample_surface_sphere(n_elem = 2, dim_S = 2, seed = 1234)
-  A = my_matrix[1,]
-  B = my_matrix[2,]
-  t_max = great_circle_distance(A, B) / 2  # t_max = 2*pi
-  theta = seq(from = 0, to = t_max, length.out = 100)
-  line_from_A_to_B = t(sapply(theta, function(t) {rotated(A, B, t)}))
-  plot_sphere()
-  plot_path_on_sphere(line_from_A_to_B)
-  plot_point_on_sphere(A, "red")
-  plot_point_on_sphere(B, "blue")
-  rm(my_matrix, A, B, t_max, theta, line_from_A_to_B)
-}
+# if(debug) {
+#   my_matrix = sample_on_S(n_elem = 2, dim_S = 2, seed = 1234)
+#   A = my_matrix[1,]
+#   B = my_matrix[2,]
+#   t_max = .distance_S_great_circle(A, B) / 2  # t_max = 2*pi
+#   theta = seq(from = 0, to = t_max, length.out = 100)
+#   line_from_A_to_B = t(sapply(theta, function(t) {rotated(A, B, t)}))
+#   plot_sphere()
+#   plot_path_on_sphere(line_from_A_to_B)
+#   plot_point_on_sphere(A, "red")
+#   plot_point_on_sphere(B, "blue")
+#   rm(my_matrix, A, B, t_max, theta, line_from_A_to_B)
+# }
 
 plot_all_points_on_sphere = function(i, my_matrix, radius = 0.05) {
   plot_point_on_sphere(my_matrix[i,], "red", radius)
@@ -85,11 +85,11 @@ segment_R_n_func = function(A, B) {
 
 segment_S_n_func = function(A, B, t_max = "segment") {
   if(t_max == "line") {
-    t_max = 2*pi 
+    t_max = 2*pi
   } else if(t_max == "segment") {
-    t_max = great_circle_distance(A, B)
+    t_max = .distance_S_great_circle(A, B)
   } else if(t_max == "semisegment") {
-    t_max = great_circle_distance(A, B) / 2
+    t_max = .distance_S_great_circle(A, B) / 2
   }
   theta = seq(from = 0, to = t_max, length.out = 100)
   line_from_A_to_B = t(sapply(theta, function(t) {rotated(A, B, t)}))
@@ -113,7 +113,7 @@ plot_evolution_circle = function(Evolution, step_min, step_max, ...) {
   if(is.na(step_max)) {
     step_max = dim(Evolution)[3]
   }
-  
+
   par(mfrow = c(1,1))
   plot_circle(...)
   for(step in seq(from = step_min, to = step_max)){
@@ -128,11 +128,11 @@ plot_circle = function(...) {
   # https://stackoverflow.com/questions/22265704/drawing-circle-in-r/22266006
   # initialize a plot
   plot(c(-1, 1), c(-1, 1), type = "n", asp = 1, ...)
-  
+
   # prepare "circle data"
   radius <- 1
   theta <- seq(0, 2 * pi, length = 200)
-  
+
   # draw the circle
   lines(x = radius * cos(theta), y = radius * sin(theta))
 }

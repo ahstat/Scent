@@ -1,1 +1,4 @@
 exportPattern("^[[:alpha:]]+")
+importFrom("stats", "rnorm", "rbinom")
+importFrom("grDevices", "dev.off", "png")
+importFrom("graphics", "lines", "par", "plot", "plot.new", "points", "title")

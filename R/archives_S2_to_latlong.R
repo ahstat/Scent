@@ -23,13 +23,13 @@ xyz_func = function(latlong) {
   return(c(x, y, z))
 }
 
-my_matrix = sample_surface_sphere(n_elem = 2, dim_S = 2, seed = 1234)
-my_matrix_converted = t(apply(my_matrix, 1, latlong_func))
-my_matrix_converted_converted = t(apply(my_matrix_converted, 1, xyz_func))
-if(sum(round(my_matrix_converted_converted - my_matrix, 10)) != 0) {
-  stop("Converting a point to coordinates and going back does not give original point")
-}
-rm(my_matrix, my_matrix_converted, my_matrix_converted_converted)
+# my_matrix = sample_on_S(n_elem = 2, dim_S = 2, seed = 1234)
+# my_matrix_converted = t(apply(my_matrix, 1, latlong_func))
+# my_matrix_converted_converted = t(apply(my_matrix_converted, 1, xyz_func))
+# if(sum(round(my_matrix_converted_converted - my_matrix, 10)) != 0) {
+#   stop("Converting a point to coordinates and going back does not give original point")
+# }
+# rm(my_matrix, my_matrix_converted, my_matrix_converted_converted)
 
 # xyz_func_gen = function(latlong) {
 #   # Convert from long/lat to cartesian for dimension > 3 (geographic system)

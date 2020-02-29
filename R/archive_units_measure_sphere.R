@@ -1,17 +1,17 @@
-A = c(0, 1, 0)
-B = c(0, 0.9, 0.5); B = B / sqrt(sum(B^2))
-# Weighted contribution of B on A on the tangent plane
-B_weighted_on_tanA = Log_weighted_S(A, B, Df)
-# Weighted contribution after going back to the sphere
-B_weighted = Exp_S(A, B_weighted_on_tanA)
-
-distance_S_great_circle(A, B_weighted)
-
-theta = distance_S_great_circle(A, B)
-Df(theta)
-
-
-# For plot, should be archive...
+# A = c(0, 1, 0)
+# B = c(0, 0.9, 0.5); B = B / sqrt(sum(B^2))
+# # Weighted contribution of B on A on the tangent plane
+# B_weighted_on_tanA = Log_weighted_S(A, B, Df)
+# # Weighted contribution after going back to the sphere
+# B_weighted = Exp_S(A, B_weighted_on_tanA)
+#
+# .distance_S_great_circle(A, B_weighted)
+#
+# theta = .distance_S_great_circle(A, B)
+# Df(theta)
+#
+#
+# # For plot, should be archive...
 
 ################################################################################
 # Derivative of the action of B on A on the sphere (see rotated for more info) #
@@ -27,7 +27,7 @@ deriv_rotated = function(A, B) {
     #stop("Points A and B are on the opposite each other")
   }
   B_prim = (B - Lambda * A) / sqrt(1 - Lambda^2)
-  if(distance_S_great_circle(B, B_prim) > pi/2) {
+  if(.distance_S_great_circle(B, B_prim) > pi/2) {
     stop("The first solution is not OK")
     # Take the other solution if B_prim is distant from B
     # B_prim = -B_prim will work in this case
@@ -82,18 +82,18 @@ rotated = function(A, B, t) {
   #c(crossprod(B_prim_1, B_prim_1)) # ok == 1
 }
 
-my_matrix = sample_surface_sphere(n_elem = 2, dim_S = 2, seed = 1234)
-A = my_matrix[1,]
-B = my_matrix[2,]
-theta = seq(from = 0, to = 2*pi, length.out = 100)
-line_from_A_to_A_by_B = t(sapply(theta, function(t) {rotated(A, B, t)}))
-if(!all(round(apply(line_from_A_to_A_by_B, 1, norm_Eucl_vec), 10) == 1)) {
-  stop("The output of rotated() is not a point of the unit sphere")
-}
-if(!all(round(rotated(A, B, 0) - A, 10) == 0)) {
-  stop("rotated with t=0 does not give the original point")
-}
-if(!all(round(rotated(A, B, pi) - (-A), 10) == 0)) {
-  stop("rotated with t=pi does not give the opposite point")
-}
-rm(my_matrix, A, B, theta, line_from_A_to_A_by_B)
+# my_matrix = sample_on_S(n_elem = 2, dim_S = 2, seed = 1234)
+# A = my_matrix[1,]
+# B = my_matrix[2,]
+# theta = seq(from = 0, to = 2*pi, length.out = 100)
+# line_from_A_to_A_by_B = t(sapply(theta, function(t) {rotated(A, B, t)}))
+# if(!all(round(apply(line_from_A_to_A_by_B, 1, norm_Eucl_vec), 10) == 1)) {
+#   stop("The output of rotated() is not a point of the unit sphere")
+# }
+# if(!all(round(rotated(A, B, 0) - A, 10) == 0)) {
+#   stop("rotated with t=0 does not give the original point")
+# }
+# if(!all(round(rotated(A, B, pi) - (-A), 10) == 0)) {
+#   stop("rotated with t=pi does not give the opposite point")
+# }
+# rm(my_matrix, A, B, theta, line_from_A_to_A_by_B)

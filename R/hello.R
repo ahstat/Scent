@@ -1,6 +1,6 @@
 # Hello, world!
 #
-# This is an example function named 'hello' 
+# This is an example function named 'hello'
 # which prints 'Hello, world!'.
 #
 # You can learn more about package authoring with RStudio at:
@@ -10,7 +10,7 @@
 # Some useful keyboard shortcuts for package authoring:
 #
 #   Build and Reload Package:  'Ctrl + Shift + B'
-#   Check Package:             'Ctrl + Shift + E'
+#   Check Package:             'Ctrl + Shift + E' == devtools::check()
 #   Test Package:              'Ctrl + Shift + T'
 
 hello <- function() {

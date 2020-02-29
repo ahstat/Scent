@@ -1,8 +1,4 @@
-Df = function(angle) {
-  -sin(angle)
-}
-
-matrix1_of_weighted_contribution = function(my_matrix, Df, manifold = "S") {
+.matrix1_of_weighted_contribution = function(my_matrix, Df, manifold = "S") {
   n_elem = nrow(my_matrix)
   d = ncol(my_matrix) # ambiant space R^d containing the manifold: H^{d-1}, S^{d-1}, or R^d
   M_log_weighted = array(NA, dim = c(n_elem, n_elem, d))
@@ -15,13 +11,13 @@ matrix1_of_weighted_contribution = function(my_matrix, Df, manifold = "S") {
   # M_log_weighted[A, B,] = weighted point B seen on the tangent space of A
 }
 
-matrix2_of_weighted_contribution_with_densitypes = function(M_log_weighted, densitypes) {
+.matrix2_of_weighted_contribution_with_densitypes = function(M_log_weighted, densitypes) {
   M_log_weighted_with_densitypes = sweep(M_log_weighted, 2, densitypes, '*')
   return(M_log_weighted_with_densitypes)
   # M_logS_weighted_with_densitypes[A, B,] = densitype + weighted point B seen on the tangent space of A
 }
 
-matrix3_of_mean_action = function(M_log_weighted_with_densitypes) {
+.matrix3_of_mean_action = function(M_log_weighted_with_densitypes) {
   n_elem = dim(M_log_weighted_with_densitypes)[1]
   d = dim(M_log_weighted_with_densitypes)[3] # ambiant space R^d containing the manifold: H^{d-1}, S^{d-1}, or R^d
   M_log_mean_action = matrix(NA, nrow = n_elem, ncol = d)
@@ -33,14 +29,14 @@ matrix3_of_mean_action = function(M_log_weighted_with_densitypes) {
   # M_log_mean_action[A,] = mean action on A seen on the tangent space of A
 }
 
-matrix4_of_mean_action_with_types = function(M_log_mean_action, types, alpha = 1) {
+.matrix4_of_mean_action_with_types = function(M_log_mean_action, types, alpha = 1) {
   M_log_mean_action_with_types = M_log_mean_action * types * alpha
   # multiply row i by types[i]*alpha
   return(M_log_mean_action_with_types)
   # M_log_mean_action_with_types[A,] = mean action on A seen on the tangent space of A with ascent or descent and force
 }
 
-matrix5_of_mean_actions_with_types_on_original_space = function(my_matrix, M_log_mean_action_with_types, manifold = "S") {
+.matrix5_of_mean_actions_with_types_on_original_space = function(my_matrix, M_log_mean_action_with_types, manifold = "S") {
   n_elem = nrow(my_matrix)
   d = ncol(my_matrix) # ambiant space R^d containing the manifold: H^{d-1}, S^{d-1}, or R^d
   M_mean_actions_with_types_on_original_space = matrix(NA, nrow = n_elem, ncol = d)
@@ -52,14 +48,18 @@ matrix5_of_mean_actions_with_types_on_original_space = function(my_matrix, M_log
 }
 
 push = function(my_matrix, Df, densitypes, types, alpha = 1, manifold = "S") {
-  M1 = matrix1_of_weighted_contribution(my_matrix, Df, manifold)
-  M2 = matrix2_of_weighted_contribution_with_densitypes(M1, densitypes)
-  M3 = matrix3_of_mean_action(M2)
-  M4 = matrix4_of_mean_action_with_types(M3, types, alpha)
-  M5 = matrix5_of_mean_actions_with_types_on_original_space(my_matrix, M4, manifold)
+  M1 = .matrix1_of_weighted_contribution(my_matrix, Df, manifold)
+  M2 = .matrix2_of_weighted_contribution_with_densitypes(M1, densitypes)
+  M3 = .matrix3_of_mean_action(M2)
+  M4 = .matrix4_of_mean_action_with_types(M3, types, alpha)
+  M5 = .matrix5_of_mean_actions_with_types_on_original_space(my_matrix, M4, manifold)
   # For preventing numerical errors:
-  M6 = t(apply(M5, 1, normalize_me))
-  # Check: apply(M6, 1, norm_Eucl_vec)
+  if(manifold == "S") {
+    M6 = t(apply(M5, 1, .normalize_me_on_S))
+  } else {
+    M6 = M5
+  }
+  # Check: apply(M6, 1, .norm_Eucl_vec)
   return(M6)
 }
 

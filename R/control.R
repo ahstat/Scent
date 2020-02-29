@@ -2,7 +2,7 @@ matrix_of_distances = function(my_matrix) {
   M = matrix(NA, nrow = nrow(my_matrix), ncol = nrow(my_matrix))
   for(i in 1:(nrow(my_matrix)-1)) {
     for(j in (i+1):nrow(my_matrix)) {
-      M[i, j] = great_circle_distance(my_matrix[i,], my_matrix[j,])
+      M[i, j] = .distance_S_great_circle(my_matrix[i,], my_matrix[j,])
     }
   }
   return(M)
@@ -25,9 +25,9 @@ plot_dist_evol = function(distEvolution, main_title = "") {
     for(j in 1:nrow(distEvolution)) {
       #print(paste(i, j))
       if(!all(is.na(distEvolution[i,j,]))) {
-        plot(distEvolution[i,j,], 
-             type = "l", 
-             #xaxt='n', 
+        plot(distEvolution[i,j,],
+             type = "l",
+             #xaxt='n',
              main = paste0("(", i, ",", j, ")"),
              ylim = c(0-1e-8, pi+1e-8))
       } else {
@@ -90,14 +90,14 @@ evol = function(my_matrix, i, vectypes, N, Df, alpha = 0.1) {
 }
 
 evol_and_plot = function(my_matrix,
-                         i, vectypes, N, alpha = 0.1, 
+                         i, vectypes, N, alpha = 0.1,
                          plot_dist = TRUE, plot_evol = TRUE, plot_evol_proj = FALSE,
                          savepng = FALSE) {
   Evolution = evol(my_matrix, i, vectypes, N, Df, alpha)
   distEvolution = dist_evol(Evolution)
-  
+
   print(paste0(i, "/", nrow(vectypes)))
-  
+
   if(plot_dist) {
     if(savepng) {
       png(paste0("plots/", i, ".png"), width = 1500, height = 1500)
@@ -107,11 +107,11 @@ evol_and_plot = function(my_matrix,
       plot_dist_evol(distEvolution, main_title = paste0("(", paste(vectypes[i,], collapse = " "), ")"))
     }
   }
-  
+
   if(plot_evol) {
     step_min = max(N/2, N - 100)
     step_max = N
-    
+
     if(savepng) {
       png(paste0("plots/", i, ".png"))
       main = i #paste0(names(vectypes[i,]), ": ", vectypes[i,], " / ", collapse = "")
@@ -122,7 +122,7 @@ evol_and_plot = function(my_matrix,
       plot_evolution(Evolution, step_min = step_min, step_max = step_min, main = main)
     }
   }
-  
+
   if(plot_evol_proj) {
     print("Not done for now. It corresponds to long/lat with S^2 and a segment in S^1")
     # tt = 1
