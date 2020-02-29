@@ -7,6 +7,11 @@ source("helpers/measure_E.R")
 source("helpers/measure_H.R")
 source("helpers/measure_S.R")
 source("helpers/measure.R")
+
+Log_weighted_M
+Exp_M
+dist_M
+
 source("helpers/move.R")
 source("helpers/sample_S.R")
 
