@@ -69,10 +69,12 @@ plot_path_on_sphere = function(traj, col = "black", radius = 0.02) {
 #   rm(my_matrix, A, B, t_max, theta, line_from_A_to_B)
 # }
 
-plot_all_points_on_sphere = function(i, my_matrix, radius = 0.05) {
-  plot_point_on_sphere(my_matrix[i,], "red", radius)
+plot_all_points_on_sphere = function(i, my_matrix, radius = 0.05,
+                                     col_i = "red",
+                                     col_others = "black") {
+  plot_point_on_sphere(my_matrix[i,], col_i, radius)
   for(j in (1:nrow(my_matrix))[-i]) {
-    plot_point_on_sphere(my_matrix[j,], "black", radius)
+    plot_point_on_sphere(my_matrix[j,], col_others, radius)
   }
 }
 

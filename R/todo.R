@@ -13,11 +13,15 @@
 #   Check Package:             'Ctrl + Shift + E' == devtools::check()
 #   Test Package:              'Ctrl + Shift + T'
 
+
+
+# todo:
+# move.R / plots.R / preplots.R / control.R / grad_func.R /
+# test-visual <--> todo_tests
+# todo_main
+
 # Done:
-#
-
-
-# Todo: Hyperbolic?
+# measure.R (except hyperbolic...) / sample.R
 
 
 #####

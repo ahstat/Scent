@@ -202,7 +202,7 @@ dist_M = function(A, B, manifold = "S") {
 ##
 .normalize_me_on_S = function(A) {
   # Normalize a point of R^d into the element of S^{d-1}
-  if(sum(A) == 0) {
+  if(all(A == 0)) {
     stop("A is 0, cannot project it on the sphere")
   }
   A / .norm_Eucl_vec(A)

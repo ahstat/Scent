@@ -63,36 +63,37 @@ square_on_S = function(dim_S) {
 ##################
 icositetrachore_on_S3 = function() {
   my_matrix = sample_on_S(n_elem = 24, dim_S = 3, seed = 1)
-  
+
   my_matrix[1,] =  c(-1, -1,  0,  0)
   my_matrix[2,] =  c(-1,  1,  0,  0)
   my_matrix[3,] =  c( 1, -1,  0,  0)
   my_matrix[4,] =  c( 1,  1,  0,  0)
-  
+
   my_matrix[5,] =  c( 0,  0, -1, -1)
   my_matrix[6,] =  c( 0,  0, -1,  1)
   my_matrix[7,] =  c( 0,  0,  1, -1)
   my_matrix[8,] =  c( 0,  0,  1,  1)
-  
+
   my_matrix[9,] =  c(-1,  0,  0, -1)
   my_matrix[10,] = c(-1,  0,  0,  1)
   my_matrix[11,] = c( 1,  0,  0, -1)
   my_matrix[12,] = c( 1,  0,  0,  1)
-  
+
   my_matrix[13,] = c( 0, -1, -1,  0)
   my_matrix[14,] = c( 0, -1,  1,  0)
   my_matrix[15,] = c( 0,  1, -1,  0)
   my_matrix[16,] = c( 0,  1,  1,  0)
-  
+
   my_matrix[17,] = c(-1,  0, -1,  0)
   my_matrix[18,] = c(-1,  0,  1,  0)
   my_matrix[19,] = c( 1,  0, -1,  0)
   my_matrix[20,] = c( 1,  0,  1,  0)
-  
+
   my_matrix[21,] = c( 0, -1,  0, -1)
   my_matrix[22,] = c( 0, -1,  0,  1)
   my_matrix[23,] = c( 0,  1,  0, -1)
   my_matrix[24,] = c( 0,  1,  0,  1)
-  
+
+  my_matrix = t(apply(my_matrix, 1, scent:::.normalize_me_on_S))
   return(my_matrix)
 }
