@@ -1,10 +1,10 @@
-.matrix1_of_weighted_contribution = function(my_matrix, Df, manifold = "S") {
+.matrix1_of_weighted_contribution = function(my_matrix, g, manifold = "S") {
   n_elem = nrow(my_matrix)
   d = ncol(my_matrix) # ambiant space R^d containing the manifold: H^{d-1}, S^{d-1}, or R^d
   M_log_weighted = array(NA, dim = c(n_elem, n_elem, d))
   for(i in 1:n_elem) {
     for(j in 1:n_elem) {
-      M_log_weighted[i,j,] = Log_weighted_M(manifold)(my_matrix[i,], my_matrix[j,], Df)
+      M_log_weighted[i,j,] = Log_weighted_M(manifold)(my_matrix[i,], my_matrix[j,], g)
     }
   }
   return(M_log_weighted)
@@ -47,8 +47,8 @@
   # M_mean_actions_with_types_on_original_space[i,] = position of A after the move
 }
 
-push = function(my_matrix, Df, densitypes, types, alpha = 1, manifold = "S") {
-  M1 = .matrix1_of_weighted_contribution(my_matrix, Df, manifold)
+push = function(my_matrix, g, densitypes, types, alpha = 1, manifold = "S") {
+  M1 = .matrix1_of_weighted_contribution(my_matrix, g, manifold)
   M2 = .matrix2_of_weighted_contribution_with_densitypes(M1, densitypes)
   M3 = .matrix3_of_mean_action(M2)
   M4 = .matrix4_of_mean_action_with_types(M3, types, alpha)
@@ -56,18 +56,22 @@ push = function(my_matrix, Df, densitypes, types, alpha = 1, manifold = "S") {
   # For preventing numerical errors:
   if(manifold == "S") {
     M6 = t(apply(M5, 1, .normalize_me_on_S))
-  } else {
+    # Check: apply(M6, 1, .norm_Eucl_vec)
+  } else if(manifold == "H") {
+    M6 = t(apply(M5, 1, .normalize_me_hyperbolic))
+  } else if(manifold == "E") {
     M6 = M5
+  } else {
+    stop("Manifold should be 'E', 'S' or 'H'")
   }
-  # Check: apply(M6, 1, .norm_Eucl_vec)
   return(M6)
 }
 
-get_evol = function(my_matrix, N, Df, densitypes, types, alpha, manifold = "S") {
+get_evol = function(my_matrix, N, g, densitypes, types, alpha, manifold = "S") {
   Evolution = array(NA, dim = c(dim(my_matrix), N))
   Evolution[,,1] = my_matrix
   for(i in 2:N) {
-    Evolution[,,i] = push(Evolution[,,i-1], Df, densitypes, types, alpha, manifold)
+    Evolution[,,i] = push(Evolution[,,i-1], g, densitypes, types, alpha, manifold)
   }
   return(Evolution)
 }

@@ -82,10 +82,10 @@ combin = function(n_elem, types = c("type", "densitype"), unitype = c(-1, 1)) {
   return(vectypes)
 }
 
-evol = function(my_matrix, i, vectypes, N, Df, alpha = 0.1) {
+evol = function(my_matrix, i, vectypes, N, g, alpha = 0.1) {
   types = as.numeric(vectypes[i, c(paste0("type", 1:nrow(my_matrix)))])
   densitypes = as.numeric(vectypes[i, c(paste0("densitype", 1:nrow(my_matrix)))])
-  Evolution = get_evol(my_matrix, N, Df, densitypes, types, alpha)
+  Evolution = get_evol(my_matrix, N, g, densitypes, types, alpha)
   return(Evolution)
 }
 
@@ -93,7 +93,7 @@ evol_and_plot = function(my_matrix,
                          i, vectypes, N, alpha = 0.1,
                          plot_dist = TRUE, plot_evol = TRUE, plot_evol_proj = FALSE,
                          savepng = FALSE) {
-  Evolution = evol(my_matrix, i, vectypes, N, Df, alpha)
+  Evolution = evol(my_matrix, i, vectypes, N, g, alpha)
   distEvolution = dist_evol(Evolution)
 
   print(paste0(i, "/", nrow(vectypes)))

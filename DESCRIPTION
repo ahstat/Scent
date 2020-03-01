@@ -10,3 +10,5 @@ License: file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: rgl
+Suggests: 
+    testthat (>= 2.1.0)

@@ -61,7 +61,7 @@ plot_path_on_sphere = function(traj, col = "black", radius = 0.02) {
 #   B = my_matrix[2,]
 #   t_max = .distance_S_great_circle(A, B) / 2  # t_max = 2*pi
 #   theta = seq(from = 0, to = t_max, length.out = 100)
-#   line_from_A_to_B = t(sapply(theta, function(t) {rotated(A, B, t)}))
+#   line_from_A_to_B = t(sapply(theta, function(t) {.rotated(A, B, t)}))
 #   plot_sphere()
 #   plot_path_on_sphere(line_from_A_to_B)
 #   plot_point_on_sphere(A, "red")
@@ -92,7 +92,7 @@ segment_S_n_func = function(A, B, t_max = "segment") {
     t_max = .distance_S_great_circle(A, B) / 2
   }
   theta = seq(from = 0, to = t_max, length.out = 100)
-  line_from_A_to_B = t(sapply(theta, function(t) {rotated(A, B, t)}))
+  line_from_A_to_B = t(sapply(theta, function(t) {.rotated(A, B, t)}))
   return(line_from_A_to_B)
 }
 

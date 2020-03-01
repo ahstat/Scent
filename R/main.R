@@ -48,17 +48,17 @@
 # my_matrix[2,] = normalize_me(c(0,-1,1/the_higher_the_closer))
 # plot_mymatrix(my_matrix)
 #
-# ## Define Df
-# # Df_current = function(angle) {
+# ## Define g
+# # g_current = function(angle) {
 # #   -sin(3*angle)
 # # }
-# Df_current = function(angle) {
+# g_current = function(angle) {
 #   if(abs(angle) < pi/4) {
 #     -sin(4*angle)
 #   } else {
 #     0
 #   }
-# }#Df
+# }#g
 #
 # ## Other parameters
 # N = 1000
@@ -72,7 +72,7 @@
 # max_val =  nrow(vectypes)
 # for(i in 1:max_val) {
 #   print(paste0(i, "/", nrow(vectypes)))
-#   Evolution = evol(my_matrix, i, vectypes, N, Df_current, alpha)
+#   Evolution = evol(my_matrix, i, vectypes, N, g_current, alpha)
 #   plot_evolution(Evolution, main = i)
 #   vel = approx_velocity(Evolution)
 #   velocities[[i]] = data.frame(expe = as.character(i), step = 2:length(vel), vel = vel[-1])
@@ -84,14 +84,14 @@
 # my_gg = ggplot(out, aes(step, vel, group = expe, label = expe)) +
 #   geom_line(alpha = 0.1) +
 #   theme_bw() + xlab("Step") + ylab("Velocity")
-# ggsave("tetraDf1000.png", my_gg, height = 10, width = 10, scale = 1.3)
+# ggsave("tetrag1000.png", my_gg, height = 10, width = 10, scale = 1.3)
 # val_out = unlist(lapply(velocities, function(x){x$vel[N-1]}))
 #
 # idx = which(val_out > 0.05)
 # vectypes[idx,]
 # for(i in idx) {
 #   print(paste0(i, "/", nrow(vectypes)))
-#   Evolution = evol(my_matrix, i, vectypes, N, Df_current, alpha)
+#   Evolution = evol(my_matrix, i, vectypes, N, g_current, alpha)
 #   plot_evolution(Evolution, main = i, step_min = N-10, step_max = N)
 # }
 #

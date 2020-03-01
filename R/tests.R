@@ -1,58 +1,3 @@
-test1 = function(seed = 1, t_max = "segment") {
-  my_matrix = sample_on_S(n_elem = 100, dim_S = 2, seed = 1)
-  A = my_matrix[1,]
-  B = my_matrix[2,]
-  if(t_max == "line") {
-    t_max = 2*pi
-  } else if(t_max == "segment") {
-    t_max = .distance_S_great_circle(A, B)
-  } else if(t_max == "semisegment") {
-    t_max = .distance_S_great_circle(A, B) / 2
-  }
-  theta = seq(from = 0, to = t_max, length.out = 100)
-  line_from_A_to_B = t(sapply(theta, function(t) {rotated(A, B, t)}))
-  apply(line_from_A_to_B, 1, .norm_Eucl_vec)
-  #plot(theta, apply(line_from_A_to_B, 1, function(x){.distance_S_great_circle(line_from_A_to_B[1,], x)}))
-
-  plot_sphere()
-  plot_path_on_sphere(line_from_A_to_B)
-  plot_point_on_sphere(A, "red")
-  plot_point_on_sphere(B, "blue")
-}
-
-test2 = function(t_max = "segment") {
-  A = c(0, 1, 0)
-  B = c(0, 0.9, 0.5); B = B / sqrt(sum(B^2))
-  if(t_max == "line") {
-    t_max = 2*pi
-  } else if(t_max == "segment") {
-    t_max = .distance_S_great_circle(A, B)
-  } else if(t_max == "semisegment") {
-    t_max = .distance_S_great_circle(A, B) / 2
-  }
-
-  theta = seq(from = 0, to = t_max, length.out = 100)
-  line_from_A_to_B = t(sapply(theta, function(t) {rotated(A, B, t)}))
-  apply(line_from_A_to_B, 1, .norm_Eucl_vec)
-  plot(theta, apply(line_from_A_to_B, 1, function(x){.distance_S_great_circle(line_from_A_to_B[1,], x)}))
-
-  plot_sphere()
-  plot_path_on_sphere(line_from_A_to_B)
-  plot_point_on_sphere(A, "red")
-  plot_point_on_sphere(B, "blue")
-
-  Lambda = c(crossprod(A, B))
-  B_prim = deriv_rotated(A, B) # necessary to live on the tangent space then
-  plot_point_on_sphere(B_prim, "green")
-
-  Tangent = list()
-  t_vec = seq(from = 0.1, to = 1, by = 0.1)
-  for(i in 1:length(t_vec)) {
-    Tangent[[i]] = A + t_vec[i] * B_prim
-    plot_point_on_sphere(Tangent[[i]], "orange")
-  }
-}
-
 test4 = function(seed = 1) {
   my_matrix = sample_on_S(n_elem = 10, dim_S = 2, seed = seed)
   #types = rep(+1, nrow(my_matrix)) # whether ascent and descent on the global mixture function
@@ -76,7 +21,7 @@ test4 = function(seed = 1) {
   N = 25
   my_matrix_list[[1]] = my_matrix
   for(k in 2:N) {
-    my_matrix_pushed = push(my_matrix_list[[k-1]], Df, densitypes, types, alpha = 0.33)
+    my_matrix_pushed = push(my_matrix_list[[k-1]], g, densitypes, types, alpha = 0.33)
     my_matrix_list[[k]] = my_matrix_pushed
   }
 
@@ -126,7 +71,7 @@ test5 = function(seed = 0, types = c(1, 1, 1), densitypes = c(1, 1, 1), alpha = 
 
   # row = point 0 of the tangent space
   # col = outside point as seen on the tangent
-  M1 = .matrix1_of_weighted_contribution(my_matrix, Df)
+  M1 = .matrix1_of_weighted_contribution(my_matrix, g)
   Bprim_onA = M1[1, 2,]
   Cprim_onA = M1[1, 3,]
   Aprim_onB = M1[2, 1,]
@@ -271,7 +216,7 @@ test6 = function(first_one = TRUE) {
 
   alpha = 0.1
   N = 100
-  Evolution = get_evol(my_matrix, N, Df, densitypes, types, alpha)
+  Evolution = get_evol(my_matrix, N, g, densitypes, types, alpha)
   distEvolution = dist_evol(Evolution)
   plot_dist_evol(distEvolution)
   plot_evolution(Evolution, 1, N)
@@ -292,7 +237,7 @@ test7 = function() {
   #densitypes = rep(+1, n_elem)
   densitypes = rspin(n_elem)
 
-  Evolution = get_evol(my_matrix, N, Df, densitypes, types, alpha)
+  Evolution = get_evol(my_matrix, N, g, densitypes, types, alpha)
   distEvolution = dist_evol(Evolution)
   plot_dist_evol(distEvolution)
   plot_evolution(Evolution, step_min = N - 20, step_max = N)

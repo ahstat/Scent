@@ -1,3 +1,3 @@
-Df = function(angle) {
+g = function(angle) {
   -sin(angle)
 }
