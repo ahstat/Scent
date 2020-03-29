@@ -85,7 +85,7 @@ combin = function(n_elem, types = c("type", "densitype"), unitype = c(-1, 1)) {
 evol = function(my_matrix, i, vectypes, N, g, alpha = 0.1) {
   types = as.numeric(vectypes[i, c(paste0("type", 1:nrow(my_matrix)))])
   densitypes = as.numeric(vectypes[i, c(paste0("densitype", 1:nrow(my_matrix)))])
-  Evolution = get_evol(my_matrix, N, g, densitypes, types, alpha)
+  Evolution = get_evol(N, my_matrix, g, densitypes, types, alpha)
   return(Evolution)
 }
 
@@ -134,10 +134,6 @@ evol_and_plot = function(my_matrix,
 
 pseudo_random_number = function() {
   as.integer((as.double(Sys.time()) * 1000 + Sys.getpid()) %% 2^31)
-}
-
-rspin = function(n_elem) {
-  2 * rbinom(n_elem, 1, prob = 1/2) - 1
 }
 
 approx_velocity = function(Evolution) {

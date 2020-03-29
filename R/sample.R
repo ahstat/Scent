@@ -1,3 +1,8 @@
+# Sample types or densitypes
+rspin = function(n_elem, prob = 1/2) {
+  2 * rbinom(n_elem, 1, prob = prob) - 1
+}
+
 # Sample of points on the sphere
 
 ###############################################################

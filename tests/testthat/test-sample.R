@@ -1,3 +1,9 @@
+test_that("rspin outputs -1 or 1", {
+  set.seed(2713)
+  expect_equal(all(rspin(1000) %in% c(-1, 1)),
+               TRUE)
+})
+
 test_that("sample_on_S outputs on the sphere", {
   my_matrix = sample_on_S(n_elem = 100, dim_S = 4, seed = 1234)
   expect_equal(apply(my_matrix, 1, .norm_Eucl_vec),

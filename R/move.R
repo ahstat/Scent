@@ -67,11 +67,55 @@ push = function(my_matrix, g, densitypes, types, alpha = 1, manifold = "S") {
   return(M6)
 }
 
-get_evol = function(my_matrix, N, g, densitypes, types, alpha, manifold = "S") {
+get_evol = function(N, my_matrix, g, densitypes, types, alpha, manifold = "S") {
+  if(N < 1L) {
+    stop("N is the number of steps in the evolution, should be a positive integer")
+  }
   Evolution = array(NA, dim = c(dim(my_matrix), N))
   Evolution[,,1] = my_matrix
-  for(i in 2:N) {
-    Evolution[,,i] = push(Evolution[,,i-1], g, densitypes, types, alpha, manifold)
+  if(N > 1L) {
+    for(i in 2:N) {
+      Evolution[,,i] = push(Evolution[,,i-1], g, densitypes, types, alpha, manifold)
+    }
   }
   return(Evolution)
+}
+
+##
+# Functions for unit testing only
+##
+
+## Testing push with Euclidian (direct formula with 2 loops)
+.test_move_Euclidian = function(my_matrix, g, densitypes, types, alpha) {
+  n = nrow(my_matrix)
+  my_matrix_E_formula = matrix(rep(NA, length(my_matrix)), ncol = ncol(my_matrix))
+  for(i in 1:n) {
+    sum_j_1_n = 0
+    for(j in 1:n) {
+      vect_diff_j_i = my_matrix[j, ] - my_matrix[i, ]
+      dist_i_j = sqrt(sum((vect_diff_j_i)^2))
+      if(dist_i_j > 0) {
+        sum_j_1_n = sum_j_1_n + densitypes[j] * (g(dist_i_j) / dist_i_j) * (vect_diff_j_i)
+      }
+    }
+    my_matrix_E_formula[i, ] = my_matrix[i, ] - alpha * (- types[i] * n^(-1) * sum_j_1_n)
+  }
+  return(my_matrix_E_formula)
+}
+
+## Testing push with any manifold (direct formula with 2 loops)
+.test_move_Manifold = function(my_matrix, g, densitypes, types, alpha, manifold) {
+  n = nrow(my_matrix)
+  my_matrix_M_formula = matrix(rep(NA, length(my_matrix)), ncol = ncol(my_matrix))
+  for(i in 1:n) {
+    A = my_matrix[i, ]
+    sum_j_1_n = 0
+    for(j in 1:n) {
+      B = my_matrix[j, ]
+      sum_j_1_n = sum_j_1_n + densitypes[j] * Log_weighted_M(manifold)(A, B, g)
+    }
+    F_i = types[i] * n^(-1) * sum_j_1_n
+    my_matrix_M_formula[i, ] = Exp_M(manifold)(A, alpha * F_i)
+  }
+  return(my_matrix_M_formula)
 }

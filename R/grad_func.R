@@ -1,3 +1,3 @@
-g = function(angle) {
+g_sin = function(angle) {
   -sin(angle)
 }

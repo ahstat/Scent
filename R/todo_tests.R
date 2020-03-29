@@ -21,7 +21,7 @@ test6 = function(first_one = TRUE) {
 
   alpha = 0.1
   N = 100
-  Evolution = get_evol(my_matrix, N, g, densitypes, types, alpha)
+  Evolution = get_evol(N, my_matrix, g, densitypes, types, alpha)
   distEvolution = dist_evol(Evolution)
   plot_dist_evol(distEvolution)
   plot_evolution(Evolution, 1, N)
@@ -42,7 +42,7 @@ test7 = function() {
   #densitypes = rep(+1, n_elem)
   densitypes = rspin(n_elem)
 
-  Evolution = get_evol(my_matrix, N, g, densitypes, types, alpha)
+  Evolution = get_evol(N, my_matrix, g, densitypes, types, alpha)
   distEvolution = dist_evol(Evolution)
   plot_dist_evol(distEvolution)
   plot_evolution(Evolution, step_min = N - 20, step_max = N)

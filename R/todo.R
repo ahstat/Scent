@@ -16,12 +16,14 @@
 
 
 # todo:
-# move.R / plots.R / preplots.R / control.R / grad_func.R /
+# 1. Explain why +1 or -1 gives attract or repulse... and step by step check...
+
+# 1. plots.R with preplots.R, then integrate test7 and test8 / 2. control.R / grad_func.R /
 # test-visual <--> todo_tests
 # todo_main
 
 # Done:
-# measure.R (except hyperbolic...) / sample.R
+# measure.R (except hyperbolic...) / sample.R / move.R
 
 
 #####
