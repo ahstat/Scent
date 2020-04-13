@@ -1,147 +1,149 @@
-matrix_of_distances = function(my_matrix) {
-  M = matrix(NA, nrow = nrow(my_matrix), ncol = nrow(my_matrix))
-  for(i in 1:(nrow(my_matrix)-1)) {
-    for(j in (i+1):nrow(my_matrix)) {
-      M[i, j] = .distance_S_great_circle(my_matrix[i,], my_matrix[j,])
-    }
-  }
-  return(M)
+##
+# Relations between N, alpha, Tmax
+##
+get_Tmax = function(alpha, N) {
+  Tmax = alpha * N
+  return(Tmax)
 }
 
-dist_evol = function(Evolution) {
-  n_elem = dim(Evolution)[1]
+get_N = function(alpha, Tmax) {
+  N = Tmax / alpha
+  return(N)
+}
+
+get_alpha = function(N, Tmax) {
+  alpha = Tmax / N
+  return(alpha)
+}
+
+##
+# Control function
+##
+summary_func = function(Evolution, manifold = "E", alpha = 1) {
   N = dim(Evolution)[3]
-  distEvolution = array(NA, dim = c(n_elem, n_elem, N))
-  for(i in 1:N) {
-    distEvolution[,,i] = matrix_of_distances(Evolution[,,i])
+  Tmax = get_Tmax(alpha, N)
+  diffposition = diffposition_func(Evolution, manifold)
+  velocity = velocity_func(Evolution, manifold, alpha)
+  acceleration = acceleration_func(Evolution, manifold, alpha)
+  return(list(Evolution = Evolution,
+              diffposition = diffposition,
+              velocity = velocity,
+              acceleration = acceleration,
+              alpha = alpha,
+              N = N,
+              Tmax = Tmax,
+              manifold = manifold))
+}
+
+##
+# Helpers
+##
+diffposition_func = function(Evolution, manifold = "E") {
+  N = dim(Evolution)[3]
+  n = dim(Evolution)[1]
+
+  diffpos_func = function(i, j, k) {
+    # i = one particle
+    # j = another particle
+    # k = step in the evolution
+    dist_M(Evolution[i,,k], Evolution[j,,k], manifold)
   }
+
+  # https://stackoverflow.com/questions/25476526
+  v <- expand.grid(1:n, 1:n, 1:N)
+  out = do.call(mapply, c(diffpos_func, unname(v)))
+  distEvolution = array(out, dim = c(n, n, N))
+
+  velocity = data.frame(velocity)
+  colnames(distEvolution) = paste0("part", 1:n)
+  rownames(distEvolution) = paste0("part", 1:n)
+
+  # # Old version
+  # matrix_of_distances = function(my_matrix) {
+  #   # do a quick version
+  #   M = matrix(NA, nrow = nrow(my_matrix), ncol = nrow(my_matrix))
+  #   for(i in 1:(nrow(my_matrix)-1)) {
+  #     for(j in (i+1):nrow(my_matrix)) {
+  #       M[i, j] = dist_M(my_matrix[i,], my_matrix[j,], manifold)
+  #     }
+  #   }
+  #   return(M)
+  # }
+  # distEvolution2 = array(NA, dim = c(n, n, N))
+  # for(k in 1:N) {
+  #   distEvolution2[,,k] = matrix_of_distances(Evolution[,,k])
+  # }
+
   return(distEvolution)
 }
 
-plot_dist_evol = function(distEvolution, main_title = "") {
-  n_elem = dim(distEvolution)[1]
-  par(mfrow=c(n_elem, n_elem), oma = c(5,4,0,0) + 1.5, mar = c(0,0,1,1) + 0.5)
-  for(i in 1:nrow(distEvolution)) {
-    for(j in 1:nrow(distEvolution)) {
-      #print(paste(i, j))
-      if(!all(is.na(distEvolution[i,j,]))) {
-        plot(distEvolution[i,j,],
-             type = "l",
-             #xaxt='n',
-             main = paste0("(", i, ",", j, ")"),
-             ylim = c(0-1e-8, pi+1e-8))
-      } else {
-        plot.new()
-      }
-    }
-  }
-  title(main_title, outer = TRUE)
-  par(mfrow=c(1,1))
-}
-
-######################################
-# Loop over all types and densitypes #
-######################################
-combin_types = function(n_elem, unitype = c(-1, 1)) {
-  out = expand.grid(rep(list(unitype), n_elem))
-  return(out)
-}
-
-combin = function(n_elem, types = c("type", "densitype"), unitype = c(-1, 1)) {
-  if(length(types) == 2) {
-    vectypes = combin_types(2*n_elem)
-    colnames(vectypes) = apply(expand.grid(c("type", "densitype"), 1:n_elem), 1, paste, collapse = "")
-  } else if(length(types) == 1) {
-    if(types == "type") {
-      densitypes = rep(+1, n_elem)
-      vectypes = combin_types(n_elem)
-      colnames(vectypes) = apply(expand.grid(c("type"), 1:n_elem), 1, paste, collapse = "")
-      for(i in 1:n_elem) {
-        vectypes[[paste0("densitype", i)]] = densitypes[i]
-      }
-      # reorder
-      my_order = apply(expand.grid(c(0, n_elem), 1:n_elem), 1, sum)
-      vectypes = vectypes[,my_order]
-    } else if(types == "densitype") {
-      types = rep(+1, n_elem)
-      vectypes = combin_types(n_elem)
-      colnames(vectypes) = apply(expand.grid(c("densitype"), 1:n_elem), 1, paste, collapse = "")
-      for(i in 1:n_elem) {
-        vectypes[[paste0("type", i)]] = types[i]
-      }
-      # reorder
-      my_order = apply(expand.grid(c(n_elem, 0), 1:n_elem), 1, sum)
-      vectypes = vectypes[,my_order]
-    } else {
-      stop("If length(types) == 1, only 'type' and 'densitype' is possible")
-    }
-  } else {
-    stop("length(types) must be of length 1 or 2")
-  }
-  colnames(vectypes) = gsub(" ", "", colnames(vectypes))
-  return(vectypes)
-}
-
-evol = function(my_matrix, i, vectypes, N, g, alpha = 0.1) {
-  types = as.numeric(vectypes[i, c(paste0("type", 1:nrow(my_matrix)))])
-  densitypes = as.numeric(vectypes[i, c(paste0("densitype", 1:nrow(my_matrix)))])
-  Evolution = get_evol(N, my_matrix, g, densitypes, types, alpha)
-  return(Evolution)
-}
-
-evol_and_plot = function(my_matrix,
-                         i, vectypes, N, alpha = 0.1,
-                         plot_dist = TRUE, plot_evol = TRUE, plot_evol_proj = FALSE,
-                         savepng = FALSE) {
-  Evolution = evol(my_matrix, i, vectypes, N, g, alpha)
-  distEvolution = dist_evol(Evolution)
-
-  print(paste0(i, "/", nrow(vectypes)))
-
-  if(plot_dist) {
-    if(savepng) {
-      png(paste0("plots/", i, ".png"), width = 1500, height = 1500)
-      plot_dist_evol(distEvolution, main_title = paste0("(", paste(vectypes[i,], collapse = " "), ")"))
-      dev.off()
-    } else {
-      plot_dist_evol(distEvolution, main_title = paste0("(", paste(vectypes[i,], collapse = " "), ")"))
-    }
-  }
-
-  if(plot_evol) {
-    step_min = max(N/2, N - 100)
-    step_max = N
-
-    if(savepng) {
-      png(paste0("plots/", i, ".png"))
-      main = i #paste0(names(vectypes[i,]), ": ", vectypes[i,], " / ", collapse = "")
-      plot_evolution(Evolution, step_min = step_min, step_max = step_min, main = main)
-      dev.off()
-    } else {
-      main = i #paste0(names(vectypes[i,]), ": ", vectypes[i,], " / ", collapse = "")
-      plot_evolution(Evolution, step_min = step_min, step_max = step_min, main = main)
-    }
-  }
-
-  if(plot_evol_proj) {
-    print("Not done for now. It corresponds to long/lat with S^2 and a segment in S^1")
-    # tt = 1
-    # plot_evolution(Evolution, step_min = tt, step_max = tt+10, main = main); tt = tt+1000
-    # source("misc/misc_S2_to_latlong.R")
-    # my_matrix_converted = t(apply(my_matrix, 1, latlong_func))
-  }
-}
-
-pseudo_random_number = function() {
-  as.integer((as.double(Sys.time()) * 1000 + Sys.getpid()) %% 2^31)
-}
-
-approx_velocity = function(Evolution) {
-  # velocity on R^n (not on S^n), ok for seeing convergence or not
+velocity_func = function(Evolution, manifold = "E", alpha = 1) {
   N = dim(Evolution)[3]
-  velocity = rep(NA, N)
-  for(i in 2:N) {
-    velocity[i] = sum(apply(Evolution[,,i] - Evolution[,,i-1], 1, function(x){sqrt(sum(x^2, na.rm = TRUE))}))
+  n = dim(Evolution)[1]
+
+  velo_func = function(i, k) {
+    # i = step in the evolution
+    # k = particule
+    dist_M(Evolution[k,,i], Evolution[k,,i-1], manifold)
   }
+
+  if(N < 2) {
+    # velocity cannot be computed in this case
+    velocity = matrix(NA, nrow = N, ncol = n)
+    colnames(velocity) = paste0("part", 1:n)
+    return(velocity)
+  }
+
+  # https://stackoverflow.com/questions/25476526
+  v <- expand.grid(2:N, 1:n)
+  out = do.call(mapply, c(velo_func, unname(v)))
+  velocity = matrix(out, nrow = N-1, ncol = n)
+  velocity = rbind(rep(NA, n), velocity)
+  velocity = data.frame(velocity)
+  colnames(velocity) = paste0("part", 1:n)
+
+  # # Old version
+  # # > 10 times slower:
+  # velocity2 = as.data.frame(matrix(rep(NA, N*n), nrow = N, ncol = n))
+  # colnames(velocity2) = paste0("part", 1:n)
+  # for(i in 2:N) {
+  #   for(k in 1:n) {
+  #     velocity2[i, k] = dist_M(Evolution[k,,i], Evolution[k,,i-1], manifold)
+  #   }
+  # }
+
+  velocity = velocity / alpha
   return(velocity)
+}
+
+acceleration_func = function(Evolution, manifold = "E", alpha = 1) {
+  N = dim(Evolution)[3]
+  if(N < 3) {
+    # acceleration cannot be computed in this case
+    acceleration = matrix(NA, nrow = N, ncol = n)
+    colnames(acceleration) = paste0("part", 1:n)
+    return(acceleration)
+  }
+
+  n = dim(Evolution)[1]
+  velocity = velocity_func(Evolution, manifold, alpha)
+  acceleration = apply(velocity, 2, diff)
+  acceleration = data.frame(rbind(rep(NA, n), acceleration))
+
+  # # Old version
+  # # > 10 times slower:
+  # N = dim(Evolution)[3]
+  # n = dim(Evolution)[1]
+  # acceleration2 = as.data.frame(matrix(rep(NA, N*n), nrow = N, ncol = n))
+  # colnames(acceleration2) = paste0("part", 1:n)
+  # for(i in 3:N) {
+  #   for(k in 1:n) {
+  #     velocity_i = dist_M(Evolution[k,,i], Evolution[k,,i-1], manifold)
+  #     velocity_i_minus_1 = dist_M(Evolution[k,,i-1], Evolution[k,,i-2], manifold)
+  #     acceleration2[i, k] = velocity_i - velocity_i_minus_1
+  #   }
+  # }
+
+  acceleration = acceleration / alpha
+  return(acceleration)
 }

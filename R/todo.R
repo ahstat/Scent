@@ -1,18 +1,24 @@
-# Hello, world!
-#
-# This is an example function named 'hello'
-# which prints 'Hello, world!'.
-#
-# You can learn more about package authoring with RStudio at:
-#
 #   http://r-pkgs.had.co.nz/
-#
-# Some useful keyboard shortcuts for package authoring:
 #
 #   Build and Reload Package:  'Ctrl + Shift + B'
 #   Check Package:             'Ctrl + Shift + E' == devtools::check()
 #   Test Package:              'Ctrl + Shift + T'
 
+# Done:
+# measure.R / test-measure.R
+# sample.R / test-sample.R
+# move.R / test-move.R
+# preplot.R / test-preplot.R
+# grad_func.R (can add after)
+# test-visual.R (can add after) visual_test_i() with i from 1 to 5
+
+# Todo:
+# control.R / test-control.R
+
+# plots.R
+# todo_main.R
+# todo_tests.R
+# todo.R
 
 
 # todo:

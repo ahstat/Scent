@@ -136,7 +136,7 @@ visual_test_4 = function() {
   N = 50
   my_matrix_list[[1]] = my_matrix
   for(k in 2:N) {
-    my_matrix_pushed = push(my_matrix_list[[k-1]], g, densitypes, types, alpha = 0.33)
+    my_matrix_pushed = push(my_matrix_list[[k-1]], g_sin, densitypes, types, alpha = 0.33)
     my_matrix_list[[k]] = my_matrix_pushed
   }
 
@@ -188,7 +188,7 @@ visual_test_5 = function() {
 
     # row = point 0 of the tangent space
     # col = outside point as seen on the tangent
-    M1 = .matrix1_of_weighted_contribution(my_matrix, g)
+    M1 = .matrix1_of_weighted_contribution(my_matrix, g_sin)
     Bprim_onA = M1[1, 2,]
     Cprim_onA = M1[1, 3,]
     Aprim_onB = M1[2, 1,]

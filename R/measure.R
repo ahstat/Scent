@@ -192,9 +192,9 @@ dist_M = function(A, B, manifold = "S") {
 # On Euclidian
 ##
 .norm_Eucl_vec = function(A) {
-  # Return ||A|| of a point of R^d
+  # Return ||A|| of a point of C^d
   # https://stackoverflow.com/questions/10933945/
-  c(sqrt(crossprod(A)))
+  abs(c(sqrt(crossprod(A, Conj(A)))))
 }
 
 ##

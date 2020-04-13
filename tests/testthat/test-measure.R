@@ -14,6 +14,12 @@ test_that(".norm_Eucl_vec gives norm in dimension n", {
                sqrt(3))
 })
 
+test_that(".norm_Eucl_vec gives norm in dimension n for complex numbers", {
+  elem = c(1+1i, 2-3*1i, -5-4*1i)
+  expect_equal(.norm_Eucl_vec(elem),
+               sqrt(sum(abs(elem)^2)))
+})
+
 test_that(".distance_E gives distance in dimension n", {
   A = c(1, 0, 0, -1, -1)
   B = c(1, 1, 1, 1, 1)
