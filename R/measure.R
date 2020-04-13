@@ -76,7 +76,15 @@ dist_M = function(A, B, manifold = "S") {
 .distance_S_great_circle = function(A, B) {
   # Points are elements of R^d belonging to S^{d-1}
   # https://en.wikipedia.org/wiki/N-vector
-  Lambda = c(crossprod(A, B))
+  Lambda = Re(c(crossprod(A, Conj(B))))
+  ## For real vectors A and B, we have Lambda = <A|B>
+  # (A and B are supposed to be unit vectors, i.e. on the sphere)
+  ## For complex vectors, we retrieve the angle between two vectors there:
+  # https://math.stackexchange.com/questions/149862/angle-between-two-vectors
+  # see also https://en.wikipedia.org/wiki/Dot_product#Complex_vectors
+  # and note what is that complex sphere is simply a large real sphere (as a manifold):
+  # https://math.stackexchange.com/questions/2691189/triviality-of-tangent-bundle-of-complex-sphere
+
   if(Lambda > 1) {
     # case of numerical problem, when Lambda = 1.00001
     return(0)
@@ -194,6 +202,7 @@ dist_M = function(A, B, manifold = "S") {
 .norm_Eucl_vec = function(A) {
   # Return ||A|| of a point of C^d
   # https://stackoverflow.com/questions/10933945/
+  # For complex, for example there https://mathcs.clarku.edu/~ma130/inner2.pdf
   abs(c(sqrt(crossprod(A, Conj(A)))))
 }
 

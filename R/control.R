@@ -7,6 +7,7 @@ get_Tmax = function(alpha, N) {
 }
 
 get_N = function(alpha, Tmax) {
+  # for reference only, N may not be an integer
   N = Tmax / alpha
   return(N)
 }
@@ -53,8 +54,6 @@ diffposition_func = function(Evolution, manifold = "E") {
   v <- expand.grid(1:n, 1:n, 1:N)
   out = do.call(mapply, c(diffpos_func, unname(v)))
   distEvolution = array(out, dim = c(n, n, N))
-
-  velocity = data.frame(velocity)
   colnames(distEvolution) = paste0("part", 1:n)
   rownames(distEvolution) = paste0("part", 1:n)
 

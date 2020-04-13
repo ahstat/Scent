@@ -20,6 +20,12 @@ test_that(".norm_Eucl_vec gives norm in dimension n for complex numbers", {
                sqrt(sum(abs(elem)^2)))
 })
 
+test_that(".norm_Eucl_vec gives norm in dimension 1 for complex numbers", {
+  elem = c(1 - 1i)
+  expect_equal(.norm_Eucl_vec(elem),
+               sqrt(2))
+})
+
 test_that(".distance_E gives distance in dimension n", {
   A = c(1, 0, 0, -1, -1)
   B = c(1, 1, 1, 1, 1)
@@ -83,6 +89,23 @@ test_that(".normalize_me_on_S gives error for 0 element", {
   expect_error(.normalize_me_on_S(elem))
 })
 
+test_that(".normalize_me_on_S gives element of S for complex elements", {
+  A = c(2 + 4 * 1i, 3 - 1i)
+  out = A / .norm_Eucl_vec(A)
+  expect_equal(sum(abs(out)^2),
+               1)
+})
+
+test_that(".normalize_me_on_S gives element of S for many complex elements", {
+  set.seed(2713)
+  for(i in 1:20) {
+    A = runif(i) + 1i * runif(i)
+    out = A / .norm_Eucl_vec(A)
+    expect_equal(sum(abs(out)^2),
+                 1)
+  }
+})
+
 test_that(".distance_S_great_circle for S^1", {
   # S^1, so each element is represented with 2 directions
   # Distance between 0 and 1 on the circle is pi/2
@@ -133,6 +156,35 @@ test_that(".distance_S_great_circle for S^2", {
                pi)
   expect_equal(.distance_S_great_circle(B, -B),
                pi)
+})
+
+test_that(".distance_S_great_circle for complex elements on the sphere", {
+  # Elements of the complex sphere are such that sum(|z_i|^2)=1 with |.| the module
+  # and z = (z_1, ..., z_d) \in \mathbb{C}^d
+
+  A = c(1i, 0, 0)
+  B = c(0, 0, -1)
+  expect_equal(.distance_S_great_circle(A, B),
+               pi/2)
+
+  A = c(1i, 0, 0)
+  B = c(1, 0, 0)
+  expect_equal(.distance_S_great_circle(A, B),
+               pi/2)
+
+  A = c(1i, 0, 0)
+  B = c(-1*1i, 0, 0)
+  expect_equal(.distance_S_great_circle(A, B),
+               pi)
+
+  A = .normalize_me_on_S(c(2 - 1i, 4 + 3 * 1i))
+  B = .normalize_me_on_S(c(1i, 5))
+  expect_equal(cos(.distance_S_great_circle(Re(A), Re(B))) + cos(.distance_S_great_circle(Im(A), Im(B))),
+               cos(.distance_S_great_circle(A, B)))
+  # Explanation:
+  # Element of C^n seen as an element of R^{2n}, so
+  # Re(<z|Conj(z')>) = \sum_k Re(z_k)*Re(z_k') + \sum_k Im(z_k)*Im(z_k') = <Re(z)|Re(z')> + <Im(z)|Im(z')>
+  # cos(\theta_z) = cos(\theta_Re(z)) + cos(\theta_Im(z))
 })
 
 test_that("Exp(Log(x)) is x for Spherical", {

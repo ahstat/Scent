@@ -4,7 +4,7 @@
 #   Check Package:             'Ctrl + Shift + E' == devtools::check()
 #   Test Package:              'Ctrl + Shift + T'
 
-# Done:
+## Done:
 # measure.R / test-measure.R
 # sample.R / test-sample.R
 # move.R / test-move.R
@@ -12,25 +12,21 @@
 # grad_func.R (can add after)
 # test-visual.R (can add after) visual_test_i() with i from 1 to 5
 
-# Todo:
+## Ongoing:
 # control.R / test-control.R
 
+## Todo:
 # plots.R
+# experiments.R
 # todo_main.R
 # todo_tests.R
 # todo.R
 
 
-# todo:
-# 1. Explain why +1 or -1 gives attract or repulse... and step by step check...
-
-# 1. plots.R with preplots.R, then integrate test7 and test8 / 2. control.R / grad_func.R /
+# TODO after:
+# 1. plots.R with preplots.R, then integrate test7 and test8 / grad_func.R /
 # test-visual <--> todo_tests
 # todo_main
-
-# Done:
-# measure.R (except hyperbolic...) / sample.R / move.R
-
 
 #####
 # 1 #
