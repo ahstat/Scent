@@ -132,6 +132,79 @@ test_that("velocity converges when alpha --> 0 for manifold S", {
   expect_equal(speed1, speed2_fewpoints, tolerance = 2*1e-2)
 })
 
-# TODO: more velocity tests
+test_that("velocity can be 1/2 for two points at distance pi/2, on manifold S", {
+  # Note: 1/2 because 2 points with same weight, so taking the mean only 1/2 of the
+  # total weight can move each particle
+  # (for the remaining particle, the distance between i and i is 0)
+
+  my_matrix = unif_on_S1(4)
+  # my_matrix[3,] = my_matrix[2,]
+  # my_matrix[4,] = my_matrix[2,]
+  my_matrix = my_matrix[c(1,2),]
+  g = g_sin
+  densitypes = c(1, 1)
+  types = c(-1, 1)
+  manifold = "S"
+
+  N = 100
+  alpha = 0.01
+  Evolution = get_evol(N, my_matrix, g, densitypes, types, alpha, manifold)
+  speed = velocity_func(Evolution, manifold, alpha)
+  expect_equal(sum(speed[-1,] - 0.5),
+               0)
+  # plot(t(Evolution[1,,]), asp = 1, xlim = c(-1, 1), ylim = c(-1, 1), type = "l")
+  # lines(t(Evolution[2,,]), col = "red")
+  # plot(speed$part1, ylim = c(0, 0.75), type = "l")
+  # lines(speed$part2, ylim = c(0, 0.75), col = "red")
+})
+
+test_that("velocity can be 1/2 for two points at distance pi/2, on manifold E", {
+  my_matrix = unif_on_S1(2)
+  my_matrix[1,] = c(0, 0)
+  my_matrix[2,] = c(pi/2, 0)
+  g = g_sin
+  densitypes = c(1, 1)
+  types = c(-1, 1)
+  manifold = "E"
+
+  N = 100
+  alpha = 0.01
+  Evolution = get_evol(N, my_matrix, g, densitypes, types, alpha, manifold)
+  speed = velocity_func(Evolution, manifold, alpha)
+  expect_equal(sum(speed[-1,] - 0.5),
+               0)
+  # plot(t(Evolution[1,,]), asp = 1, xlim = c(-1, 1), ylim = c(-1, 1), type = "l")
+  # lines(t(Evolution[2,,]), col = "red")
+  # plot(speed$part1, ylim = c(0, 0.75), type = "l")
+  # lines(speed$part2, ylim = c(0, 0.75), col = "red")
+})
+
+test_that("velocity decrease to 0 for two points with -1 types, on manifold E", {
+  my_matrix = unif_on_S1(2)
+  my_matrix[1,] = c(-pi/4, 0)
+  my_matrix[2,] = c(pi/4, 0)
+  g = g_sin
+  densitypes = c(1, 1)
+  types = c(-1, -1)
+  manifold = "E"
+
+  N = 100
+  alpha = 0.3
+  Evolution = get_evol(N, my_matrix, g, densitypes, types, alpha, manifold)
+  speed = velocity_func(Evolution, manifold, alpha)
+  expect_equal(sum(speed[N,] - 0),
+               0)
+  # plot(t(Evolution[1,,]), asp = 1, xlim = c(-1, 1), ylim = c(-1, 1), type = "l")
+  # lines(t(Evolution[2,,]), col = "red")
+  # plot(speed$part1, ylim = c(0, 0.75), type = "l")
+  # lines(speed$part2, ylim = c(0, 0.75), col = "red")
+})
+
 # TODO: acceleration tests
 # TODO: summary_func tests
+# TODO: total displacement (=sum of velocity) What is the maximum of total displacement per particle? --> 1/2
+# cf:
+# 1 displacement for 2 particles --> 1/2 per particle
+# 0.5 0.5 0.5 0.5 for 2 for 4 particles --> 1/2 per particle
+# 0.75 0.25 0.25 0.25 --> 1.5
+# 1 0 ... 0 --> 1

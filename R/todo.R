@@ -22,6 +22,7 @@
 # todo_tests.R
 # todo.R
 
+# TODO after: adding weight (N1 particles at the same points vs N2 at other point)
 
 # TODO after:
 # 1. plots.R with preplots.R, then integrate test7 and test8 / grad_func.R /
