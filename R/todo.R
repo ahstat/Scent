@@ -11,12 +11,12 @@
 # preplot.R / test-preplot.R
 # grad_func.R (can add after)
 # test-visual.R (can add after) visual_test_i() with i from 1 to 5
-
-## Ongoing:
 # control.R / test-control.R
 
-## Todo:
+## Ongoing:
 # plots.R
+
+## Todo:
 # experiments.R
 # todo_main.R
 # todo_tests.R
@@ -28,6 +28,16 @@
 # 1. plots.R with preplots.R, then integrate test7 and test8 / grad_func.R /
 # test-visual <--> todo_tests
 # todo_main
+
+# TODO: total displacement (=sum of velocity) What is the maximum of total displacement per particle? --> 1/2
+# cf:
+# 1 displacement for 2 particles --> 1/2 per particle
+# 0.5 0.5 0.5 0.5 for 2 for 4 particles --> 1/2 per particle
+# 0.75 0.25 0.25 0.25 --> 1.5
+# 1 0 ... 0 --> 1
+
+# TODO Close formula for -sin(theta) with 2 points going to speed 0.5 to 0 (formula of the whole function? looks like exponential decay) (formula for E and S looks the same!)
+
 
 #####
 # 1 #

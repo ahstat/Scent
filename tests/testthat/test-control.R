@@ -200,11 +200,109 @@ test_that("velocity decrease to 0 for two points with -1 types, on manifold E", 
   # lines(speed$part2, ylim = c(0, 0.75), col = "red")
 })
 
-# TODO: acceleration tests
-# TODO: summary_func tests
-# TODO: total displacement (=sum of velocity) What is the maximum of total displacement per particle? --> 1/2
-# cf:
-# 1 displacement for 2 particles --> 1/2 per particle
-# 0.5 0.5 0.5 0.5 for 2 for 4 particles --> 1/2 per particle
-# 0.75 0.25 0.25 0.25 --> 1.5
-# 1 0 ... 0 --> 1
+test_that("acceleration for 2 points on manifold E", {
+  my_matrix = unif_on_S1(2)
+  my_matrix[1,] = c(-pi/2+0.01, 0)
+  my_matrix[2,] = c(pi/2-0.01, 0)
+  g = g_sin
+  densitypes = c(1, 1)
+  types = c(-1, -1)
+  manifold = "E"
+
+  N = 1000
+  alpha = 0.01
+  Evolution = get_evol(N, my_matrix, g, densitypes, types, alpha, manifold)
+  speed = velocity_func(Evolution, manifold, alpha)
+  acceleration = acceleration_func(Evolution, manifold, alpha)
+
+  # Acceleration is symmetric for two points
+  expect_equal(acceleration[,1],
+               acceleration[,2])
+  # Initially, the acceleration is almost 0
+  expect_equal(acceleration[3,1],
+               0, tolerance = 1e-2)
+  # Before max speed, the acceleration increases
+  expect_equal(acceleration[200, 1] > 0,
+               TRUE)
+  # After max speed, the acceleration decreases
+  expect_equal(acceleration[800, 1] < 0,
+               TRUE)
+  # At the end, the acceleration is almost 0
+  expect_equal(acceleration[N,1],
+               0, tolerance = 1e-2)
+
+  # plot(t(Evolution[1,,]), asp = 1, xlim = c(-1, 1), ylim = c(-1, 1), type = "l")
+  # lines(t(Evolution[2,,]), col = "red")
+  # plot(speed$part1, ylim = c(-0.3, 0.75), type = "l") # close formula?
+  # lines(acceleration$part1, type = "l", lty = 2)
+})
+
+test_that("acceleration for 2 points on manifold S", {
+  my_matrix = unif_on_S1(2)
+  z = exp(1i*(pi-0.1))
+  my_matrix[2,] = c(Re(z), Im(z))
+  g = g_sin
+  densitypes = c(1, 1)
+  types = c(-1, -1)
+  manifold = "S"
+
+  N = 1000
+  alpha = 0.01
+  Evolution = get_evol(N, my_matrix, g, densitypes, types, alpha, manifold)
+  speed = velocity_func(Evolution, manifold, alpha)
+  acceleration = acceleration_func(Evolution, manifold, alpha)
+
+  # Acceleration is symmetric for two points
+  expect_equal(acceleration[,1],
+               acceleration[,2],
+               tolerance = 1e-6) # need quick large tolerance, many numeric errors
+  # Initially, the acceleration is almost 0
+  expect_equal(acceleration[3,1],
+               0, tolerance = 1e-1)
+  # Before max speed, the acceleration increases
+  expect_equal(acceleration[200, 1] > 0,
+               TRUE)
+  # After max speed, the acceleration decreases
+  expect_equal(acceleration[800, 1] < 0,
+               TRUE)
+  # At the end, the acceleration is almost 0
+  expect_equal(acceleration[N,1],
+               0, tolerance = 1e-2)
+
+  # plot(t(Evolution[1,,]), asp = 1, xlim = c(-1, 1), ylim = c(-1, 1), type = "l")
+  # lines(t(Evolution[2,,]), col = "red")
+  # plot(speed$part1, ylim = c(-0.3, 0.75), type = "l") # close formula?
+  # lines(acceleration$part1, type = "l", lty = 2)
+})
+
+test_that("summary_func gives correct elements of the list", {
+  my_matrix = unif_on_S1(2)
+  my_matrix[1,] = c(-pi/4, 0)
+  my_matrix[2,] = c(pi/4, 0)
+  g = g_sin
+  densitypes = c(1, 1)
+  types = c(-1, -1)
+  manifold = "E"
+
+  N = 100
+  alpha = 0.3
+  Evolution = get_evol(N, my_matrix, g, densitypes, types, alpha, manifold)
+  summary = summary_func(Evolution, manifold, alpha)
+  speed = velocity_func(Evolution, manifold, alpha)
+  expect_equal(summary$Evolution,
+               Evolution)
+  expect_equal(summary$diffposition,
+               diffposition_func(Evolution, manifold))
+  expect_equal(summary$velocity,
+               velocity_func(Evolution, manifold, alpha))
+  expect_equal(summary$acceleration,
+               acceleration_func(Evolution, manifold, alpha))
+  expect_equal(summary$alpha,
+               alpha)
+  expect_equal(summary$N,
+               N)
+  expect_equal(summary$Tmax,
+               get_Tmax(alpha, N))
+  expect_equal(summary$manifold,
+               manifold)
+})
