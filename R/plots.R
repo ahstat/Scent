@@ -1,120 +1,281 @@
-library(ggplot2)
-library(dplyr)
+##############################
+# Configuration of the plots #
+##############################
 
+## Blank theme
 theme_blank = function() {
-  theme(axis.line = element_blank(),
-        axis.text.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks = element_blank(),
-        axis.title.x = element_blank(),
-        axis.title.y = element_blank(),
-        legend.position = "none",
-        panel.background = element_blank(),
-        panel.border = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        plot.background = element_blank())
+  ggplot2::theme(axis.line = ggplot2::element_blank(),
+                 axis.text.x = ggplot2::element_blank(),
+                 axis.text.y = ggplot2::element_blank(),
+                 axis.ticks = ggplot2::element_blank(),
+                 axis.title.x = ggplot2::element_blank(),
+                 axis.title.y = ggplot2::element_blank(),
+                 legend.position = "none",
+                 panel.background = ggplot2::element_blank(),
+                 panel.border = ggplot2::element_blank(),
+                 panel.grid.major = ggplot2::element_blank(),
+                 panel.grid.minor = ggplot2::element_blank(),
+                 plot.background = ggplot2::element_blank())
 }
 
-heads_alpha = 1 # full color
-heads_shape = 19 # filled point
-
-tails_alpha = 0.3
-tails_shape = 1 # circled point
-cols = c("partic1" = "red", "partic2" = "black")
-
-trail = "solid"
-trail = "fade" # fade from begining to end
-trail = 6 # fade up to 6 steps back
-
-
-plotting_option = 2
-
-
-Tmax = 1
-N = 20
-
-df_plot1 = data.frame(t = seq(from = 0, to = Tmax, length.out = N),
-                      pos_x = 1:N,
-                      pos_y = 1:N)
-df_plot2 = data.frame(t = seq(from = 0, to = Tmax, length.out = N),
-                      pos_x = 1:N,
-                      pos_y = rev(1:N))
-df_plot_list = list()
-df_plot_list[["partic1"]] = df_plot1
-df_plot_list[["partic2"]] = df_plot2
-# df_plot_list is the input / each element of the list must be ordered in time
-
-Nsizes = sapply(df_plot_list, nrow)
-if(!all(Nsizes == Nsizes[1])) {
-  stop("All particles must have the same number of steps")
-}
-
-
-
-if(trail == "fade") {
-  alpha_func = function(N) {
-    (1:N)/N
-  }
-} else if(trail == "solid") {
-  alpha_func = function(N) {
-    1
-  }
-} else if(is.numeric(trail)) {
-  base_trail = (1:trail)/trail
-  alpha_func = function(N) {
-    out = tail(base_trail, N)
-    N0 = length(out)
-    if(N > N0) {
-      out = c(rep(0, N - N0), out)
+## Fading shape after the head
+get_alpha_func = function(trail = "fade") {
+  if(trail == "fade") {
+    alpha_func = function(N) {
+      (1:N)/N # fading from solid (at head) to transparent (at tail)
     }
-    return(out)
+  } else if(trail == "solid") {
+    alpha_func = function(N) {
+      1 # solid line from head to tail
+    }
+  } else if(is.numeric(trail)) {
+    base_trail = (1:trail)/trail
+    alpha_func = function(N) {
+      out = tail(base_trail, N)
+      N0 = length(out)
+      if(N > N0) {
+        out = c(rep(0, N - N0), out)
+      }
+      return(out) # fading from solid (at head) to transparent (at head - trail)
+    }
+  } else {
+    stop("trail must be 'fade', 'solid' or a positive integer")
   }
-} else {
-  stop("trail must be 'fade', 'solid' or a positive integer")
 }
 
-df_plot = bind_rows(df_plot_list, .id = "id") %>%
-  rename(points = id) %>%
-  mutate(points = factor(points))
-df_plot$alpha = as.vector(sapply(Nsizes, alpha_func))
-
-
-df_tails = df_plot %>%
-  group_by(points) %>%
-  arrange(t) %>%
-  summarise(t = t[1], pos_x = pos_x[1], pos_y = pos_y[1])
-df_heads = df_plot %>%
-  group_by(points) %>%
-  arrange(-t) %>%
-  summarise(t = t[1], pos_x = pos_x[1], pos_y = pos_y[1])
-
-
-df_tails$alpha = tails_alpha
-df_heads$alpha = heads_alpha
-
-
-
-p = ggplot(df_plot, aes(x = pos_x, y = pos_y, color = points, alpha = alpha)) +
-  geom_path() + scale_colour_manual(values = cols) +
-  guides(alpha=FALSE)
-
-p = p +
-  geom_point(data = df_tails, shape = tails_shape) +
-  geom_point(data = df_heads, shape = heads_shape)
-
-if(plotting_option == 1) {
-  p = p + theme_bw()
-} else if(plotting_option == 2) {
-  p = p + theme_bw() + theme(legend.position = "none")
-} else if(plotting_option == 3) {
-  p = p + theme_blank()
+## Palettes of color
+generic_palette = function(nb_part, kind_of_palette) {
+  if(kind_of_palette == "first_red") {
+    cols = c("red")
+    cols = c(cols, rep("black", nb_part - 1))
+  } else {
+    stop("TODO, implement in generic_palette function")
+  }
+  return(cols)
 }
 
-p
+## Global plotting configuration
+plot_config_func = function(plotting_option = 2, # 1 with legend / 2 without legend / 3 blank theme
+                            trail = "fade", # "solid", "fade" or integer
+                            kind_of_palette = "first_red",
+                            xlab = "Position x",
+                            ylab = "Position y",
+                            main_title = NULL,
+                            legend_title = "Particle",
+                            heads_alpha = 1, # full color
+                            heads_shape = 19, # filled point
+                            tails_alpha = 0.3,
+                            tails_shape = 1, # circled point
+                            t_labels = TRUE,
+                            t_labels_nbMax = 5,
+                            t_labels_prettyNumDigits = 2,
+                            t_labels_size = 2.5,
+                            t_labels_tEqualText = TRUE,
+                            t_labels_removeEndPoints = TRUE) {
+  list(plotting_option = plotting_option,
+       trail = trail,
+       kind_of_palette = kind_of_palette,
+       xlab = xlab,
+       ylab = ylab,
+       main_title = main_title,
+       legend_title = legend_title,
+       heads_alpha = heads_alpha,
+       heads_shape = heads_shape,
+       tails_alpha = tails_alpha,
+       tails_shape = tails_shape,
+       t_labels = t_labels,
+       t_labels_nbMax = t_labels_nbMax,
+       t_labels_prettyNumDigits = t_labels_prettyNumDigits,
+       t_labels_size = t_labels_size,
+       t_labels_tEqualText = t_labels_tEqualText,
+       t_labels_removeEndPoints = t_labels_removeEndPoints)
+}
 
-## to continue
+## Generic path plotting
+generic_path_plot = function(df_plot_list,
+                             plot_config = list(plotting_option = 2, # 1 with legend / 2 without legend / 3 blank theme
+                                                trail = "fade", # "solid", "fade" or integer
+                                                kind_of_palette = "first_red",
+                                                xlab = "Position x",
+                                                ylab = "Position y",
+                                                main_title = NULL,
+                                                legend_title = "Particle",
+                                                heads_alpha = 1, # full color
+                                                heads_shape = 19, # filled point
+                                                tails_alpha = 0.3,
+                                                tails_shape = 1, # circled point
+                                                t_labels = TRUE,
+                                                t_labels_nbMax = 5,
+                                                t_labels_prettyNumDigits = 2,
+                                                t_labels_size = 2.5,
+                                                t_labels_tEqualText = TRUE,
+                                                t_labels_removeEndPoints = TRUE)) {
+  ## Attaching variables
+  plotting_option = plot_config$plotting_option
+  trail = plot_config$trail
+  kind_of_palette = plot_config$kind_of_palette
+  xlab = plot_config$xlab
+  ylab = plot_config$ylab
+  main_title = plot_config$main_title
+  legend_title = plot_config$legend_title
+  heads_alpha = plot_config$heads_alpha
+  heads_shape = plot_config$heads_shape
+  tails_alpha = plot_config$tails_alpha
+  tails_shape = plot_config$tails_shape
+  t_labels = plot_config$t_labels
+  t_labels_nbMax = plot_config$t_labels_nbMax
+  t_labels_prettyNumDigits = plot_config$t_labels_prettyNumDigits
+  t_labels_size = plot_config$t_labels_size
+  t_labels_tEqualText = plot_config$t_labels_tEqualText
+  t_labels_removeEndPoints = plot_config$t_labels_removeEndPoints
 
+  ## Color palette
+  nb_part = length(df_plot_list)
+  if(nb_part < 1) {
+    stop("Need at least one point to plot")
+  }
+  cols = generic_palette(nb_part, kind_of_palette) # c("partic1" = "red", "partic2" = "black")
+
+  ## Check
+  if(any(sapply(df_plot_list, function(x){is.unsorted(x$t)}))) {
+    stop("Each element of df_plot_list must be sorted by time")
+  }
+
+  ## Preparation
+  Nsizes = sapply(df_plot_list, nrow)
+
+  # Adding text legend
+  t_legend = sapply(Nsizes, function(x) {floor(seq(from = 1, to = x, length.out = t_labels_nbMax))})
+  for(i in 1:length(df_plot_list)) {
+    df_plot_list[[i]]$t_labels = NA
+    t_labels_out = prettyNum(df_plot_list[[i]]$t[t_legend[,1]], digits = t_labels_prettyNumDigits)
+    if(t_labels_tEqualText) {
+      t_labels_out = paste0("t=", t_labels_out)
+    }
+    if(t_labels_removeEndPoints) {
+      t_labels_out[1] = NA
+      t_labels_out[length(t_labels_out)] = NA
+    }
+    df_plot_list[[i]]$t_labels[t_legend[,1]] = t_labels_out
+  }
+
+  # Combine list elements
+  df_plot = bind_rows(df_plot_list, .id = "id") %>%
+    rename(points = id) %>%
+    mutate(points = factor(points))
+
+  df_tails = df_plot %>%
+    group_by(points) %>%
+    arrange(t) %>%
+    summarise(t = t[1], pos_x = pos_x[1], pos_y = pos_y[1])
+
+  df_heads = df_plot %>%
+    group_by(points) %>%
+    arrange(-t) %>%
+    summarise(t = t[1], pos_x = pos_x[1], pos_y = pos_y[1])
+
+  # Adding alpha
+  alpha_func = get_alpha_func(trail)
+  df_plot$alpha = as.vector(sapply(Nsizes, alpha_func))
+  df_tails$alpha = tails_alpha
+  df_heads$alpha = heads_alpha
+
+  ## Plotting
+  p = ggplot2::ggplot(df_plot, ggplot2::aes(x = pos_x, y = pos_y, color = points, alpha = alpha, label = t_labels)) +
+    ggplot2::geom_path(na.rm = TRUE) + ggplot2::guides(alpha=FALSE) +
+    ggplot2::xlab(xlab) + ggplot2::ylab(ylab) + ggplot2::labs(color = legend_title, title = main_title)
+
+  if(t_labels) {
+    p = p + ggplot2::geom_label(size = t_labels_size, na.rm = TRUE, hjust = 0.5)
+  }
+
+  if(!is.null(cols)) {
+    if(is.null(names(cols))) { # align/check cols with names of df_plot_list
+      if(!is.null(names(df_plot_list))) {
+        names(cols) = names(df_plot_list)
+      } else {
+        names(cols) = levels(df_plot$points)
+      }
+    }
+    p = p + ggplot2::scale_colour_manual(values = cols)
+  }
+
+  if(!is.null(tails_shape)) {
+    p = p +
+      ggplot2::geom_point(data = df_tails, shape = tails_shape, na.rm = TRUE)
+  }
+
+  if(!is.null(heads_shape)) {
+    p = p +
+      ggplot2::geom_point(data = df_heads, shape = heads_shape, na.rm = TRUE)
+  }
+
+  if(plotting_option == 1) {
+    p = p + ggplot2::theme_bw()
+  } else if(plotting_option == 2) {
+    p = p + ggplot2::theme_bw() + ggplot2::theme(legend.position = "none")
+  } else if(plotting_option == 3) {
+    p = p + theme_blank()
+  }
+  return(p)
+}
+
+## Plot of scent from a summary
+plot_scent = function(x = "velocity", y = "acceleration", summary,
+                      plot_config = plot_config_func()) {
+  t = seq(from = 0, to = summary$Tmax, length.out = summary$N)
+  nb_part = dim(summary$Evolution)[1]
+
+  ## Change labels
+  if(x == "velocity") {
+    plot_config$xlab = "Velocity"
+  } else if(x == "acceleration") {
+    plot_config$xlab = "Acceleration"
+  } else if(x == "time") {
+    plot_config$xlab = "Time"
+  } else if(grepl("dim", x)) {
+    x_number = as.numeric(gsub("dim", "", x, fixed = TRUE))
+    plot_config$xlab = paste0("Dimension ", x_number)
+  }
+
+  if(y == "velocity") {
+    plot_config$ylab = "Velocity"
+  } else if(y == "acceleration") {
+    plot_config$ylab = "Acceleration"
+  } else if(y == "time") {
+    plot_config$ylab = "Time"
+  } else if(grepl("dim", y)) {
+    y_number = as.numeric(gsub("dim", "", y, fixed = TRUE))
+    plot_config$ylab = paste0("Dimension ", y_number)
+  }
+
+  ## pos_x / pos_y
+  if(x == "velocity" || x == "acceleration") {
+    pos_x = summary[[x]]
+  } else if(x == "time") {
+    pos_x = data.frame(matrix(rep(t, nb_part), nrow = summary$N, ncol = nb_part))
+  } else if(grepl("dim", x)) {
+    x_number = as.numeric(gsub("dim", "", x, fixed = TRUE))
+    pos_x = data.frame(t(summary$Evolution[, x_number,]))
+  }
+
+  if(y == "velocity" || y == "acceleration") {
+    pos_y = summary[[y]]
+  } else if(y == "time") {
+    pos_y = data.frame(matrix(rep(t, nb_part), nrow = summary$N, ncol = nb_part))
+  } else if(grepl("dim", y)) {
+    y_number = as.numeric(gsub("dim", "", y, fixed = TRUE))
+    pos_y = data.frame(t(summary$Evolution[, y_number,]))
+  }
+
+  ## Plot
+  df_plot_list = list()
+  for(i in 1:nb_part) {
+    df_plot_list[[i]] = data.frame(t = t, pos_x = pos_x[,i], pos_y = pos_y[,i])
+  }
+
+  generic_path_plot(df_plot_list, plot_config)
+}
 
 # plot_evolution = function(Evolution, step_min = 1, step_max = NA, step_by = 1, ...) {
 #   if(dim(Evolution)[2] == 2) {
@@ -126,8 +287,6 @@ p
 #   }
 # }
 #
-
-
 
 # plot_mymatrix = function(my_matrix, ...) {
 #   N = 1
