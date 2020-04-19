@@ -156,3 +156,69 @@ test_that("plot_scent does not throw error", {
                   plot_config_func(plotting_option = 1, t_labels = TRUE))
   expect_error(p5, NA)
 })
+
+test_that("plot_scent does not throw error (some additional plots)", {
+  ## Test 6
+  p6 = list()
+  p6[[1]] = list()
+  p6[[2]] = list()
+
+  n_elem = 3
+  my_matrix = unif_on_S1(n_elem)
+  manifold = "E"
+  alpha = 0.1
+  N = 100
+
+  for(test_id in c(1, 2)) {
+    if(test_id == 1) {
+      types = c(1, 1, -1)
+      densitypes = c(1, -1, -1)
+    } else {
+      types = c(-1, -1, -1)
+      densitypes = c(-1, 1, -1)
+    }
+
+    types_name = paste0("(", paste(types, collapse = ", "), ")")
+    densitypes_name = paste0("(", paste(densitypes, collapse = ", "), ")")
+
+    Evolution = get_evol(N, my_matrix, g, densitypes, types, alpha, manifold)
+    summary = summary_func(Evolution, manifold, alpha)
+    p6[[test_id]][[1]] = plot_scent("dim1", "dim2", summary, plot_config = plot_config_func()) +
+      geom_circle() + ggplot2::coord_equal() +
+      ggplot2::ggtitle(paste0("types ", types_name, " and densitypes ", densitypes_name))
+    p6[[test_id]][[2]] = plot_scent("dist1", "dist2", summary, plot_config = plot_config_func()) +
+      ggplot2::coord_equal() +
+      ggplot2::ggtitle(paste0("types ", types_name, " and densitypes ", densitypes_name))
+  }
+
+  expect_error(p6[[1]][[1]], NA)
+  expect_error(p6[[1]][[2]], NA)
+  expect_error(p6[[2]][[1]], NA)
+  expect_error(p6[[2]][[2]], NA)
+
+  ## Test 7
+  p7 = list()
+
+  set.seed(1)
+  my_matrix = tetrahedron_on_S2()
+  n_elem = nrow(my_matrix)
+  alpha = 0.008
+  N = 1000
+  types = rspin(n_elem)
+  densitypes = rspin(n_elem)
+  manifold = "S"
+
+  Evolution = get_evol(N, my_matrix, g, densitypes, types, alpha, manifold)
+  summary = summary_func(Evolution, manifold, alpha)
+  plot_config = plot_config_func(plotting_option = 1, kind_of_palette = "default", trail = 500)
+  p7[[1]] = plot_scent("dim1", "dim2", summary, plot_config = plot_config) +
+    geom_circle() + ggplot2::coord_equal()
+  p7[[2]] = plot_scent("dist1", "dist3", summary, plot_config = plot_config) +
+    ggplot2::coord_equal()
+  p7[[3]] = plot_scent("velocity", "acceleration", summary, plot_config = plot_config) +
+    ggplot2::coord_equal()
+
+  expect_error(p7[[1]], NA)
+  expect_error(p7[[2]], NA)
+  expect_error(p7[[3]], NA)
+})

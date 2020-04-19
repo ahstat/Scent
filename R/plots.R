@@ -158,12 +158,15 @@ generic_path_plot = function(df_plot_list,
     dplyr::rename(points = id) %>%
     dplyr::mutate(points = factor(points))
 
-  df_tails = df_plot %>%
+  df_heads_tails = df_plot %>% dplyr::select(points, t, pos_x, pos_y)
+  df_heads_tails = na.omit(df_heads_tails)
+
+  df_tails = df_heads_tails %>%
     dplyr::group_by(points) %>%
     dplyr::arrange(t) %>%
     dplyr::summarise(t = t[1], pos_x = pos_x[1], pos_y = pos_y[1])
 
-  df_heads = df_plot %>%
+  df_heads = df_heads_tails %>%
     dplyr::group_by(points) %>%
     dplyr::arrange(-t) %>%
     dplyr::summarise(t = t[1], pos_x = pos_x[1], pos_y = pos_y[1])

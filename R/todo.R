@@ -15,6 +15,7 @@
 # plots.R / test-plots.R
 
 ## Ongoing:
+# Loop on "summary" for each row of types/densitypes
 
 ## Todo:
 # experiments.R
@@ -22,9 +23,40 @@
 # todo_tests.R
 # todo.R
 
-## TODO:
-# 2. check why speed > 0.5 --> understood because good configuration: many points at distance close to pi/2
 
+
+#### >>>> Need to do some loop somehow!!!!
+test8_circle = function() {
+  n_elem = 4
+  my_matrix = unif_on_S1(n_elem)
+  N = 1000
+
+  ## All combination of types and densitypes selected
+  vectypes = combin(n_elem)
+  for(i in 1:nrow(vectypes)) {
+    if(i < 10) {
+      evol_and_plot(my_matrix, i, vectypes, N)
+    }
+  }
+}
+
+test8_sphere = function() {
+  my_matrix = tetrahedron_on_S2()
+  n_elem = nrow(my_matrix)
+  N = 1000
+
+  ## All combination of types and densitypes selected
+  vectypes = combin(n_elem)
+  for(i in 1:nrow(vectypes)) {
+    if(i < 10) {
+      evol_and_plot(my_matrix, i, vectypes, N)
+    }
+  }
+}
+
+## TODO:
+# * check why speed > 0.5 --> understood because good configuration: many points at distance close to pi/2
+# * See simplest case where velocity=0 and acceleration change of sign
 
 
 # TODO after: adding weight (N1 particles at the same points vs N2 at other point)
