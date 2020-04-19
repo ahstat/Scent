@@ -66,3 +66,107 @@ test8 = function(dimshape = "sphere") {
     }
   }
 }
+
+########
+# Misc #
+########
+
+plot_evolution = function(Evolution, step_min = 1, step_max = NA, step_by = 1, ...) {
+  if(dim(Evolution)[2] == 2) {
+    plot_evolution_circle(Evolution, step_min, step_max, ...)
+  } else if(dim(Evolution)[2] == 3) {
+    plot_evolution_sphere(Evolution, step_min, step_max, step_by)
+  } else {
+    stop(paste0("Evolution should live on S1 or S2, but found: S", dim(Evolution)[2]-1))
+  }
+}
+
+
+plot_mymatrix = function(my_matrix, ...) {
+  N = 1
+  Evolution = array(NA, dim = c(dim(my_matrix), N))
+  Evolution[,,1] = my_matrix
+  plot_evolution(Evolution, step_min = 1, step_max = NA, ...)
+}
+
+###################
+# Plotting on S^2 #
+###################
+plot_evolution_sphere = function(Evolution, step_min, step_max, step_by) {
+  if(is.na(step_max)) {
+    step_max = dim(Evolution)[3]
+  }
+
+  plot_sphere()
+  for(step in seq(from = step_min, to = step_max, by = step_by)){
+    step = floor(step)
+    colpalette = c("red", "blue", "green", "yellow", "magenta", "cyan", "orange", "darkgray")
+    for(k in 1:nrow(Evolution)) {
+      if(k <= length(colpalette)) {
+        plot_point_on_sphere(Evolution[k,,step], colpalette[k])
+      } else {
+        plot_point_on_sphere(Evolution[k,,step], "black")
+      }
+    }
+  }
+}
+
+# if(debug) {
+#   my_matrix = sample_on_S(n_elem = 2, dim_S = 2, seed = 1234)
+#   A = my_matrix[1,]
+#   B = my_matrix[2,]
+#   t_max = .distance_S_great_circle(A, B) / 2  # t_max = 2*pi
+#   theta = seq(from = 0, to = t_max, length.out = 100)
+#   line_from_A_to_B = t(sapply(theta, function(t) {.rotated(A, B, t)}))
+#   plot_sphere()
+#   plot_path_on_sphere(line_from_A_to_B)
+#   plot_point_on_sphere(A, "red")
+#   plot_point_on_sphere(B, "blue")
+#   rm(my_matrix, A, B, t_max, theta, line_from_A_to_B)
+# }
+
+###################
+# Plotting on S^1 #
+###################
+plot_evolution_circle = function(Evolution, step_min, step_max, ...) {
+  if(is.na(step_max)) {
+    step_max = dim(Evolution)[3]
+  }
+
+  par(mfrow = c(1,1))
+  plot_circle(...)
+  for(step in seq(from = step_min, to = step_max)){
+    step = floor(step)
+    for(k in 1:nrow(Evolution)) {
+      plot_point_on_circle(Evolution[k,,step], col = k+1, 2)
+    }
+  }
+}
+
+plot_circle = function(...) {
+  # https://stackoverflow.com/questions/22265704/drawing-circle-in-r/22266006
+  # initialize a plot
+  plot(c(-1, 1), c(-1, 1), type = "n", asp = 1, ...)
+
+  # prepare "circle data"
+  radius <- 1
+  theta <- seq(0, 2 * pi, length = 200)
+
+  # draw the circle
+  lines(x = radius * cos(theta), y = radius * sin(theta))
+}
+
+plot_point_on_circle = function(A, col = "red", radius = 0.1) {
+  points(A[1], A[2], col = col, lwd = radius)
+}
+
+plot_path_on_circle = function(traj, col = "black", radius = 2) {
+  x <- traj[,1]
+  y <- traj[,2]
+  lines(x, y, col = col, lwd = radius)
+}
+
+plot_segment_R_2 = function(A, B, col = "black") {
+  segment_R_2 = segment_R_n_func(A, B)
+  plot_path_on_circle(segment_R_2, col = col)
+}

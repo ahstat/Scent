@@ -50,3 +50,12 @@ test_that(".rotated outputs on the sphere", {
   expect_equal(apply(line_from_A_to_A_by_B, 1, .norm_Eucl_vec),
                rep(1,100))
 })
+
+# Around 30 seconds for testing
+# test_that("visual tests do not throw error", {
+#   expect_error(visual_test_1(), NA)
+#   expect_error(visual_test_2(), NA)
+#   expect_error(visual_test_3(), NA)
+#   expect_error(visual_test_4(), NA)
+#   expect_error(visual_test_5(), NA)
+# })

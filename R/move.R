@@ -71,6 +71,13 @@ get_evol = function(N, my_matrix, g, densitypes, types, alpha, manifold = "S") {
   if(N < 1L) {
     stop("N is the number of steps in the evolution, should be a positive integer")
   }
+  if(length(densitypes) != dim(my_matrix)[1]) {
+    stop("Incorrect number of densitypes")
+  }
+  if(length(types) != dim(my_matrix)[1]) {
+    stop("Incorrect number of types")
+  }
+
   Evolution = array(NA, dim = c(dim(my_matrix), N))
   Evolution[,,1] = my_matrix
   if(N > 1L) {

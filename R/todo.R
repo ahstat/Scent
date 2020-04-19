@@ -12,15 +12,20 @@
 # grad_func.R (can add after)
 # test-visual.R (can add after) visual_test_i() with i from 1 to 5
 # control.R / test-control.R
+# plots.R / test-plots.R
 
 ## Ongoing:
-# plots.R
 
 ## Todo:
 # experiments.R
 # todo_main.R
 # todo_tests.R
 # todo.R
+
+## TODO:
+# 2. check why speed > 0.5 --> understood because good configuration: many points at distance close to pi/2
+
+
 
 # TODO after: adding weight (N1 particles at the same points vs N2 at other point)
 
