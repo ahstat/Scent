@@ -22,3 +22,11 @@ plot(t, 1 + cos(t), ylim = c(-1, 2))
 lines(t, -sin(t), col = "red")
 
 Maybe more natural densities exist
+
+### Blabla
+https://en.wikipedia.org/wiki/Spherical_harmonics
+
+
+### TODO:
+Also check in all cases that g(0) = 0 somewhere
+Same ylim for velocity on all pdf graphs

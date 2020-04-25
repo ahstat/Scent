@@ -379,3 +379,55 @@ test_that("multiplot_scent gives the correct number of plots", {
   my_pos_xy_wrong = data.frame(pos_x = "time", pos_y = "velocity")
   expect_error(multiplot_scent(my_experiments, my_pos_xy_wrong, summary_list, config_for_plot_func()))
 })
+
+test_that("older tests still give some results on the circle", {
+  # Case 1
+  n_elem = 4
+  my_matrix = unif_on_S1(n_elem)
+  g = g_sin
+  densitypes = combin(n_elem, 2)
+  types = rep(1, n_elem)
+  manifold = "S"
+  N = 10
+  alpha = 1
+  Tmax = NULL
+
+  ## Experiments and summary
+  my_experiments = define_experiments(my_matrix, g, densitypes, types, manifold,
+                                      N, alpha, Tmax)
+  summary_list = compute_summary_list(my_experiments, verbose = FALSE)
+
+  ## Plotting
+  my_pos_xy = data.frame(pos_x = "time", pos_y = "velocity",
+                         stringsAsFactors = FALSE)
+  p_list = multiplot_scent(my_experiments, my_pos_xy, summary_list, config_for_plot_func())
+  # ggsave_func(p_list, outfile = "multipage_circle.pdf")
+
+  expect_error(p_list, NA)
+})
+
+test_that("older tests still give some results on the tetrahedron", {
+  # Case 2
+  my_matrix = tetrahedron_on_S2()
+  n_elem = nrow(my_matrix)
+  g = g_sin
+  densitypes = combin(n_elem, 2)
+  types = rep(1, n_elem)
+  manifold = "S"
+  N = 10
+  alpha = 1
+  Tmax = NULL
+
+  ## Experiments and summary
+  my_experiments = define_experiments(my_matrix, g, densitypes, types, manifold,
+                                      N, alpha, Tmax)
+  summary_list = compute_summary_list(my_experiments, verbose = FALSE)
+
+  ## Plotting
+  my_pos_xy = data.frame(pos_x = "time", pos_y = "velocity",
+                         stringsAsFactors = FALSE)
+  p_list = multiplot_scent(my_experiments, my_pos_xy, summary_list, config_for_plot_func())
+  # ggsave_func(p_list, outfile = "multipage_sphere.pdf")
+
+  expect_error(p_list, NA)
+})

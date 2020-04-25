@@ -16,12 +16,210 @@
 # multiplots.R / test-multiplots.R
 
 ## Ongoing:
-# todo.R / todo_tests.R / todo_main.R / experiments.R
+# todo.R
 
 ## Todo:
 # document + pictures
 # todo inside the text
 
+
+
+# FIRST ----
+
+# # Untitled 1 ----
+#
+# my_matrix = unif_on_S1(3)
+# g = g_sin
+# #densitypes = c(1, 1, -exp(1i * pi/4))
+# densitypes = c(1, 1, -1)
+# types = c(1, -1, -1)
+# manifold = "E"
+#
+# ## Check convergence when alpha --> 0
+# alpha = 1
+# Tmax = 100
+# N = Tmax / alpha
+# Evolution = get_evol(N = N, my_matrix, g, densitypes, types, alpha, manifold)
+# t1 = seq(from = 0, to = Tmax, by = alpha)
+# t1 = t1[-length(t1)]
+# velocity1 = velocity_func(Evolution, manifold, alpha)
+# acceleration1 = acceleration_func(Evolution, manifold, alpha)
+#
+# Evolution = Evolution[,,1:3]
+#
+# alpha = 0.1
+# Evolution = get_evol(N = Tmax/alpha, my_matrix, g, densitypes, types, alpha, manifold)
+# t01 = seq(from = 0, to = Tmax, by = alpha)
+# t01 = t01[-length(t01)]
+# velocity01 = velocity_func(Evolution, manifold, alpha)
+# acceleration01 = acceleration_func(Evolution, manifold, alpha)
+#
+# alpha = 0.01
+# Evolution = get_evol(N = Tmax/alpha, my_matrix, g, densitypes, types, alpha, manifold)
+# t001 = seq(from = 0, to = Tmax, by = alpha)
+# t001 = t001[-length(t001)]
+# velocity001 = velocity_func(Evolution, manifold, alpha)
+# acceleration001 = acceleration_func(Evolution, manifold, alpha)
+#
+# plot(t1, velocity1[,1], type = "l")
+# lines(t01, velocity01[,1], type = "l")
+# lines(t001, velocity001[,1], type = "l")
+#
+# plot(t1, acceleration1[,1], type = "l")
+# lines(t01, acceleration01[,1], type = "l")
+# lines(t001, acceleration001[,1], type = "l")
+#
+# plot(t001, velocity001[,1], type = "l")
+#
+# plot(velocity1[,1], acceleration1[,1], type = "l")
+# lines(velocity01[,1], acceleration01[,1], type = "l")
+# lines(velocity001[,1], acceleration001[,1], type = "l")
+#
+# plot(velocity001[,1], acceleration001[,1], type = "l")
+# range = 490:10000
+# plot(velocity001[range,1], acceleration001[range,1], type = "l")
+# range = 1:490
+# plot(velocity001[range,1], acceleration001[range,1], type = "l")
+# range = 490:650
+# plot(velocity001[range,1], acceleration001[range,1], type = "l")
+# range = 650:3000
+# plot(velocity001[range,1], acceleration001[range,1], type = "l")
+# range = 3000:10000
+# plot(velocity001[range,1], acceleration001[range,1], type = "l")
+# plot(velocity001[range,1], type = "l")
+# plot(acceleration001[range,1], type = "l")
+#
+# plot(velocity001[,1], acceleration001[,1], type = "l", ylim = c(-0.18, 0.03), xlim = c(0, 0.6), asp = 1)
+# lines(velocity001[,2], acceleration001[,2], type = "l", col = "red")
+# lines(velocity001[,3], acceleration001[,3], type = "l", col = "blue")
+#
+# range = 3000:10000
+# plot(t(Evolution[1,,range]), type = "l", asp = 1, ylim = c(-1.8, 1))
+# lines(t(Evolution[2,,range]), asp = 1, type = "l", col = 2)
+# lines(t(Evolution[3,,range]), asp = 1, type = "l", col = 3)
+#
+# plot(t(Evolution[1,,range]), type = "l", asp = 1)
+#
+#
+# ## Untitled 2 ----
+#
+# my_matrix = unif_on_S1(3)
+# g = g_sin
+# densitypes = c(1, 1, -1)
+# types = c(1, -1, -1)
+# manifold = "S"
+#
+# ## Check convergence when alpha --> 0
+# Tmax = 100
+# alpha = 0.01
+# Evolution = get_evol(N = Tmax/alpha, my_matrix, g, densitypes, types, alpha, manifold)
+# t001 = seq(from = 0, to = Tmax, by = alpha)
+# t001 = t001[-length(t001)]
+# velocity001 = velocity_func(Evolution, manifold, alpha)
+# acceleration001 = acceleration_func(Evolution, manifold, alpha)
+#
+# plot(t001, velocity001[,1], type = "l")
+#
+# plot(velocity001[,1], acceleration001[,1], type = "l")
+# range = 490:10000
+# plot(velocity001[range,1], acceleration001[range,1], type = "l")
+# range = 1:490
+# plot(velocity001[range,1], acceleration001[range,1], type = "l")
+# range = 490:650
+# plot(velocity001[range,1], acceleration001[range,1], type = "l")
+# range = 650:3000
+# plot(velocity001[range,1], acceleration001[range,1], type = "l")
+# range = 3000:10000
+# plot(velocity001[range,1], acceleration001[range,1], type = "l")
+# plot(velocity001[range,1], type = "l")
+# plot(acceleration001[range,1], type = "l")
+#
+# plot(velocity001[,1], acceleration001[,1], type = "l", ylim = c(-0.18, 0.03), xlim = c(0, 0.6), asp = 1)
+# lines(velocity001[,2], acceleration001[,2], type = "l", col = "red")
+# lines(velocity001[,3], acceleration001[,3], type = "l", col = "blue")
+#
+# range = 3000:10000
+# plot(t(Evolution[1,,range]), type = "l", asp = 1, ylim = c(-1.8, 1))
+# lines(t(Evolution[2,,range]), asp = 1, type = "l", col = 2)
+# lines(t(Evolution[3,,range]), asp = 1, type = "l", col = 3)
+#
+# plot(t(Evolution[1,,range]), type = "l", asp = 1)
+#
+#
+#
+#
+# range = 499:503
+# plot(velocity001[range,1], acceleration001[range,1], type = "l")
+#
+# range2 = 497:503
+# plot(t(Evolution[1,,range2]), col = 1)
+# text(t(Evolution[1,,range2]), labels = range2, cex = 0.7, pos = 3)
+#
+#
+# ###################################################################################
+#
+#
+# Tmax = 10
+# alpha = 0.001
+# Evolution = get_evol(N = Tmax/alpha, my_matrix, g, densitypes, types, alpha, manifold)
+# t001 = seq(from = 0, to = Tmax, by = alpha)
+# t001 = t001[-length(t001)]
+# velocity001 = velocity_func(Evolution, manifold, alpha)
+# acceleration001 = acceleration_func(Evolution, manifold, alpha)
+#
+# plot(t001, velocity001[,1], type = "l")
+#
+# plot(velocity001[,1], acceleration001[,1], type = "l")
+# range = 4900:10000
+# plot(velocity001[range,1], acceleration001[range,1], type = "l")
+# range = 1:4900
+# plot(velocity001[range,1], acceleration001[range,1], type = "l")
+# range = 4900:6500
+# plot(velocity001[range,1], acceleration001[range,1], type = "l")
+# range = 6500:10000
+# plot(velocity001[range,1], acceleration001[range,1], type = "l")
+#
+# plot(velocity001[,1], acceleration001[,1], type = "l", ylim = c(-0.18, 0.03), xlim = c(0, 0.6), asp = 1)
+# lines(velocity001[,2], acceleration001[,2], type = "l", col = "red")
+# lines(velocity001[,3], acceleration001[,3], type = "l", col = "blue")
+#
+# range = 4960:5030
+# plot(velocity001[range,1], acceleration001[range,1], type = "l")
+#
+# range2 = 4970:5030
+# plot(t(Evolution[1,,range2]), col = 1)
+# text(t(Evolution[1,,range2]), labels = range2, cex = 0.7, pos = 3)
+#
+# # Redo:
+# my_matrix = Evolution[,,4960]
+# Tmax = 1
+# alpha = 0.0001
+# Evolution2 = get_evol(N = Tmax/alpha, my_matrix, g, densitypes, types, alpha, manifold)
+# t001 = seq(from = 0, to = Tmax, by = alpha)
+# t001 = t001[-length(t001)]
+# velocity001 = velocity_func(Evolution2, manifold, alpha)
+# acceleration001 = acceleration_func(Evolution2, manifold, alpha)
+# range2 = 190:500
+# plot(t(Evolution2[1,,range2]), col = 1, type = "p")
+# text(t(Evolution2[1,,range2]), labels = range2, cex = 0.7, pos = 3)
+#
+# range = 1:10000
+# plot(velocity001[range,1], acceleration001[range,1], type = "l")
+# plot(velocity001[range2,1], acceleration001[range2,1], type = "l")
+# plot(velocity001[range2,1], type = "l")
+#
+# plot(t(Evolution2[1,,range]), col = 1, type = "l", xlim = c(-1,1), ylim = c(-1,1))
+# lines(t(Evolution2[2,,range]), col = 1)
+# lines(t(Evolution2[3,,range]), col = 1)
+#
+# # Here is the behavior: velocity goes to 0 and rebound (because on the circle)
+# # so normal to get somehow infinite acceleration due to numerical errors
+# plot(velocity001[range2,1], type = "l")
+#
+#
+#
+
+# FOLLOWING ----
 
 
 
@@ -70,35 +268,54 @@
 # ggsave_func(p_list, outfile = "multipage.pdf")
 
 
+## TODO: Add more choices for g the derivative of the density function
+## Define g
+# g_current = function(angle) {
+#   -sin(3*angle)
+# }
+#
+# g_current = function(angle) {
+#   if(abs(angle) < pi/2) {
+#     -sin(2*angle)
+#   } else {
+#     0
+#   }
+# }
+#
+# g_current = function(angle) {
+#   if(abs(angle) < pi/4) {
+#     -sin(4*angle)
+#   } else {
+#     0
+#   }
+# }
+#
+# g_current = function(angle) {
+#   -sin(10*angle)
+# }
+#
+# deriv_dnorm = function(x, dim = 1) {
+#   # parametre de forme.
+#   out = - ((1 / (2*pi)^(1/2)) * exp(-sum(x^2)/2) * x) / C_deriv_dnorm(dim)
+#   return(out)
+# }
+#
+# C_deriv_dnorm = function(dim = 1) {
+#   return((2*pi)^((dim-1)/2))
+# }
+#
+# g_current = function(x) {deriv_dnorm(x, dim = 2)}
+#
+# sinc = function(x) {
+#   ifelse(x == 0, 1, sin(x)/x)
+# }
+#
+# x = seq(from = -pi, to = pi, length.out = 100)
+# plot(x, sinc(x))
+# lines(x, (cos(x) + 1) / 2, col = "blue")
 
-# #### >>>> Need to do some loop somehow!!!!
-# test8_circle = function() {
-#   n_elem = 4
-#   my_matrix = unif_on_S1(n_elem)
-#   N = 1000
-#
-#   ## All combination of types and densitypes selected
-#   vectypes = combin(n_elem)
-#   for(i in 1:nrow(vectypes)) {
-#     if(i < 10) {
-#       evol_and_plot(my_matrix, i, vectypes, N)
-#     }
-#   }
-# }
-#
-# test8_sphere = function() {
-#   my_matrix = tetrahedron_on_S2()
-#   n_elem = nrow(my_matrix)
-#   N = 1000
-#
-#   ## All combination of types and densitypes selected
-#   vectypes = combin(n_elem)
-#   for(i in 1:nrow(vectypes)) {
-#     if(i < 10) {
-#       evol_and_plot(my_matrix, i, vectypes, N)
-#     }
-#   }
-# }
+## END define g
+
 
 ## TODO:
 # * check why speed > 0.5 --> understood because good configuration: many points at distance close to pi/2
@@ -120,117 +337,3 @@
 # 1 0 ... 0 --> 1
 
 # TODO Close formula for -sin(theta) with 2 points going to speed 0.5 to 0 (formula of the whole function? looks like exponential decay) (formula for E and S looks the same!)
-
-
-#####
-# 1 #
-#####
-# Also check in all cases that g(0) = 0 somewhere
-# create testg == testg somewhere
-
-#####
-# 2 #
-#####
-# ### Blabla misc
-# theta = seq(from = -pi, to = pi, length.out = 100)
-# plot(theta, tan(theta), type = "p")
-# plot(theta, 1/(cos(theta)^2), type = "l")
-# # https://fr.wikipedia.org/wiki/Harmonique_sphérique
-
-#####
-# 3 #
-#####
-# plot_all_prim_from_i = function(i, my_matrix_deriv, radius = 0.05) {
-#   for(j in (1:nrow(my_matrix_deriv))[-i]) {
-#     plot_point_on_sphere(my_matrix_deriv[i,j,], "lightgray", radius)
-#   }
-# }
-#
-# plot_all_tangent_from_i = function(i, my_matrix, my_matrix_deriv, weighted = FALSE,
-#                                    dir_points, my_matrix_derivdist) {
-#   N = nrow(my_matrix)
-#   if(!weighted) {
-#     W = rep(1, N)
-#   } else {
-#     W = dir_points*my_matrix_derivdist[i,] / N
-#   }
-#   t_vec = seq(from = 0.1, to = 1, by = 0.05)
-#   for(j in (1:nrow(my_matrix))[-i]) {
-#     traj_tangent = t(sapply(t_vec, function(t) {my_matrix[i,] + t * W[j] * my_matrix_deriv[i,j,]}))
-#     plot_path_on_sphere(traj_tangent, "lightgray")
-#   }
-# }
-#
-# plot_all_tangent_from_i_new = function(i, my_matrix, M_logS_weighted) {
-#   N = nrow(my_matrix)
-#   t_vec = seq(from = 0.1, to = 1, by = 0.05)
-#   for(j in (1:nrow(my_matrix))[-i]) {
-#     traj_tangent = t(sapply(t_vec, function(t) {my_matrix[i,] + t * M_logS_weighted[i,j,]}))
-#     plot_path_on_sphere(traj_tangent, "orange")
-#   }
-# }
-#
-# plot_mean_tangent_with_weights_from_i = function(i, dir_points, my_matrix_derivdist, my_matrix_deriv, my_matrix) {
-#   mean_tangent = get_mean_tangent_with_weights_from_i(i, dir_points, my_matrix_derivdist, my_matrix_deriv)
-#   t_vec = seq(from = 0.1, to = 1, by = 0.05)
-#   traj_tangent = t(sapply(t_vec, function(t) {my_matrix[i,] + t * mean_tangent}))
-#   plot_path_on_sphere(traj_tangent, "goldenrod")
-# }
-#
-# plot_mean_tangent_with_weights_from_i_new = function(i, my_matrix, M_logS_weighted) {
-#   mean_tangent = apply(M_logS_weighted[i,,], 2, mean)
-#   t_vec = seq(from = 0, to = 1, by = 0.05)
-#   traj_tangent = t(sapply(t_vec, function(t) {my_matrix[i,] + t * mean_tangent}))
-#   plot_path_on_sphere(traj_tangent, "goldenrod")
-# }
-
-#####
-# 4 #
-#####
-# ###################
-# # S2 to lat long: #
-# ###################
-# ## Can help to understand but not used in main code and only for n = 3
-# latlong_func = function(xyz) {
-#   # Convert from cartesian to long/lat (geographic system)
-#   # https://en.wikipedia.org/wiki/N-vector
-#   x = xyz[1]
-#   y = xyz[2]
-#   z = xyz[3]
-#   lat = atan2(z, sqrt(x^2 + y^2))
-#   long = atan2(y, x)
-#   return(c(lat, long))
-# }
-#
-# xyz_func = function(latlong) {
-#   # Convert from long/lat to cartesian (geographic system)
-#   # https://en.wikipedia.org/wiki/N-vector
-#   lat = latlong[1]
-#   long = latlong[2]
-#   x = cos(lat) * cos(long)
-#   y = cos(lat) * sin(long)
-#   z = sin(lat)
-#   return(c(x, y, z))
-# }
-#
-# my_matrix = sample_on_S(n_elem = 2, dim_S = 2, seed = 1234)
-# my_matrix_converted = t(apply(my_matrix, 1, latlong_func))
-# my_matrix_converted_converted = t(apply(my_matrix_converted, 1, xyz_func))
-# if(sum(round(my_matrix_converted_converted - my_matrix, 10)) != 0) {
-#   stop("Converting a point to coordinates and going back does not give original point")
-# }
-# rm(my_matrix, my_matrix_converted, my_matrix_converted_converted)
-#
-# xyz_func_gen = function(latlong) {
-#   # Convert from long/lat to cartesian for dimension > 3 (geographic system)
-#   # Not tested.
-#   # https://fr.wikipedia.org/wiki/Coordonn%C3%A9es_sph%C3%A9riques#G%C3%A9n%C3%A9ralisation_en_dimension_n
-#   # generalize geographic coordinates
-#   # lat1, lat2, lat3 ... lat(n-1) long
-#   sin_latlong = c(sin(latlong), 1)
-#   prod_cos_latlong = c(1, cumprod(cos(latlong)))
-#   x = rev(prod_cos_latlong * sin_latlong)
-#   return(x)
-# }
-
-
