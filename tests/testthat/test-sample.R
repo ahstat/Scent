@@ -31,64 +31,18 @@ test_that("rspin with nb_on_circle to 4 outputs -1, 1, i, -i", {
 test_that("combin with many elements still gives typeX and densitypeX colnames (with 'type' only)", {
   n_elem = 12
   nb_on_circle = 2
-  out = combin(n_elem, types = c("type"), nb_on_circle)
-  expected_colnames = c("type1", "densitype1", "type2", "densitype2",
-                        "type3", "densitype3", "type4", "densitype4",
-                        "type5", "densitype5", "type6", "densitype6",
-                        "type7", "densitype7", "type8", "densitype8",
-                        "type9", "densitype9", "type10", "densitype10",
-                        "type11", "densitype11", "type12", "densitype12")
-  expect_equal(colnames(out),
-               expected_colnames)
-})
-
-test_that("combin still gives typeX and densitypeX colnames when only 'densitypes'", {
-  n_elem = 12
-  nb_on_circle = 2
-  out = combin(n_elem, types = c("densitype"), nb_on_circle)
-  expected_colnames = c("type1", "densitype1", "type2", "densitype2",
-                        "type3", "densitype3", "type4", "densitype4",
-                        "type5", "densitype5", "type6", "densitype6",
-                        "type7", "densitype7", "type8", "densitype8",
-                        "type9", "densitype9", "type10", "densitype10",
-                        "type11", "densitype11", "type12", "densitype12")
-  expect_equal(colnames(out),
-               expected_colnames)
-})
-
-test_that("combin still gives typeX and densitypeX colnames when both 'types' and 'densitypes'", {
-  n_elem = 5
-  nb_on_circle = 2
-  out = combin(n_elem, types = c("type", "densitype"), nb_on_circle)
-  expected_colnames = c("type1", "densitype1", "type2", "densitype2",
-                        "type3", "densitype3", "type4", "densitype4",
-                        "type5", "densitype5")
-  expect_equal(colnames(out),
-               expected_colnames)
+  out = combin(n_elem, nb_on_circle)
+  expect_equal(length(out), 2^12)
+  expect_equal(out[[1]], rep(1, n_elem))
+  expect_equal(out[[4096]], rep(-1, n_elem))
 })
 
 test_that("combin with nb_on_circle = 3 gives elements on circle_elements(3)", {
   n_elem = 5
   nb_on_circle = 3
-  out = combin(n_elem, types = c("type", "densitype"), nb_on_circle)
+  out = combin(n_elem, nb_on_circle)
   expect_equal(unique(unlist(out)) ,
                circle_elements(3))
-})
-
-test_that("combin with 'type' keep 'densitype' to 1", {
-  n_elem = 5
-  nb_on_circle = 3
-  out = combin(n_elem, types = c("type"), nb_on_circle)
-  expect_equal(all(c(out$densitype1, out$densitype2, out$densitype3, out$densitype4, out$densitype5) == 1),
-               TRUE)
-})
-
-test_that("combin with 'densitytype' keep 'type' to 1", {
-  n_elem = 5
-  nb_on_circle = 3
-  out = combin(n_elem, types = c("densitype"), nb_on_circle)
-  expect_equal(all(c(out$type1, out$type2, out$type3, out$type4, out$type5) == 1),
-               TRUE)
 })
 
 test_that("sample_on_S outputs on the sphere", {

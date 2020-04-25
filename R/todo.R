@@ -13,46 +13,92 @@
 # test-visual.R (can add after) visual_test_i() with i from 1 to 5
 # control.R / test-control.R
 # plots.R / test-plots.R
+# multiplots.R / test-multiplots.R
 
 ## Ongoing:
-# Loop on "summary" for each row of types/densitypes
+# todo.R / todo_tests.R / todo_main.R / experiments.R
 
 ## Todo:
-# experiments.R
-# todo_main.R
-# todo_tests.R
-# todo.R
+# document + pictures
+# todo inside the text
 
 
 
-#### >>>> Need to do some loop somehow!!!!
-test8_circle = function() {
-  n_elem = 4
-  my_matrix = unif_on_S1(n_elem)
-  N = 1000
 
-  ## All combination of types and densitypes selected
-  vectypes = combin(n_elem)
-  for(i in 1:nrow(vectypes)) {
-    if(i < 10) {
-      evol_and_plot(my_matrix, i, vectypes, N)
-    }
-  }
-}
 
-test8_sphere = function() {
-  my_matrix = tetrahedron_on_S2()
-  n_elem = nrow(my_matrix)
-  N = 1000
+# my_matrix = unif_on_S1(5)
+# g = g_sin
+# #densitypes = list(c(1, 1, 1, 1, 1),
+# #                  c(1, -1, 1, 1, 1))
+# densitypes = c(1, 1, 1, 1, 1)
+# types = combin(5, 2)# c(-1, -1, 1, 1, 1)
+# #types = c(-1, -1, 1, 1, 1)
+# manifold = "E"
+# N = c(10, 100, 1000)
+# Tmax = 3
+# alpha = NULL
+#
+# order_grid = order_grid_default_func()
+#
+# config_for_plot = config_for_plot_func(plotting_option = 2,
+#                                        t_labels = FALSE,
+#                                        kind_of_palette = "default")
+#
+#
+# my_experiments = define_experiments(my_matrix, g, densitypes, types, manifold,
+#                                     N, alpha, Tmax,
+#                                     order_grid)
+# summary_list = compute_summary_list(my_experiments)
+#
+# summary_list_filtered = filter_summary_list(summary_list,
+#                                             "velocity", "at the end is",
+#                                             greater_than = 0.3, "for at least one particle")
+#
+# s1000 = summary_list[which(sapply(summary_list, function(x){x$N}) == 1000)]
+# s10 = summary_list[which(sapply(summary_list, function(x){x$N}) == 10)]
+# plot(sapply(s1000, function(x){max(x$velocity[1000,])}), sapply(s10, function(x){max(x$velocity[10,])}))
+#
+# my_pos_xy = data.frame(pos_x = c("time", "time"),
+#                        pos_y = c("velocity", "acceleration"),
+#                        stringsAsFactors = FALSE)
+#
+# my_experiments$title = paste0("types = (", sapply(my_experiments$types,
+#                                                   function(x) {paste(x, collapse = ", ")}), ")",
+#                               " / N = ", my_experiments$N)
+#
+# p_list = multiplot_scent(my_experiments, my_pos_xy, summary_list_filtered, config_for_plot)
+# ggsave_func(p_list, outfile = "multipage.pdf")
 
-  ## All combination of types and densitypes selected
-  vectypes = combin(n_elem)
-  for(i in 1:nrow(vectypes)) {
-    if(i < 10) {
-      evol_and_plot(my_matrix, i, vectypes, N)
-    }
-  }
-}
+
+
+# #### >>>> Need to do some loop somehow!!!!
+# test8_circle = function() {
+#   n_elem = 4
+#   my_matrix = unif_on_S1(n_elem)
+#   N = 1000
+#
+#   ## All combination of types and densitypes selected
+#   vectypes = combin(n_elem)
+#   for(i in 1:nrow(vectypes)) {
+#     if(i < 10) {
+#       evol_and_plot(my_matrix, i, vectypes, N)
+#     }
+#   }
+# }
+#
+# test8_sphere = function() {
+#   my_matrix = tetrahedron_on_S2()
+#   n_elem = nrow(my_matrix)
+#   N = 1000
+#
+#   ## All combination of types and densitypes selected
+#   vectypes = combin(n_elem)
+#   for(i in 1:nrow(vectypes)) {
+#     if(i < 10) {
+#       evol_and_plot(my_matrix, i, vectypes, N)
+#     }
+#   }
+# }
 
 ## TODO:
 # * check why speed > 0.5 --> understood because good configuration: many points at distance close to pi/2

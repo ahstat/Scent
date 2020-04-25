@@ -9,6 +9,6 @@ Description: More about what it does (maybe more than one line)
 License: file LICENSE
 Encoding: UTF-8
 LazyData: true
-Imports: rgl, dplyr, ggplot2
+Imports: rgl, dplyr, ggplot2, gridExtra, rlang
 Suggests: 
     testthat (>= 2.1.0)

@@ -32,7 +32,7 @@ get_alpha_func = function(trail = "fade") {
     trail = as.numeric(trail)
     base_trail = (1:trail)/trail
     alpha_func = function(N) {
-      out = tail(base_trail, N)
+      out = utils::tail(base_trail, N)
       N0 = length(out)
       if(N > N0) {
         out = c(rep(0, N - N0), out)
@@ -52,7 +52,7 @@ generic_palette = function(nb_part, kind_of_palette) {
   } else if(kind_of_palette == "default") {
     gg_color_hue <- function(n) {
       hues = seq(15, 375, length = n + 1)
-      hcl(h = hues, l = 65, c = 100)[1:n]
+      grDevices::hcl(h = hues, l = 65, c = 100)[1:n]
     }
     cols = gg_color_hue(nb_part)
   } else if(kind_of_palette == "blind") {
@@ -73,23 +73,23 @@ generic_palette = function(nb_part, kind_of_palette) {
 }
 
 ## Global plotting configuration
-plot_config_func = function(plotting_option = 2, # 1 with legend / 2 without legend / 3 blank theme
-                            trail = "fade", # "solid", "fade" or integer
-                            kind_of_palette = "first_red",
-                            xlab = "Position x",
-                            ylab = "Position y",
-                            main_title = NULL,
-                            legend_title = "Particle",
-                            heads_alpha = 1, # full color
-                            heads_shape = 19, # filled point
-                            tails_alpha = 0.3,
-                            tails_shape = 1, # circled point
-                            t_labels = TRUE,
-                            t_labels_nbMax = 5,
-                            t_labels_prettyNumDigits = 2,
-                            t_labels_size = 2.5,
-                            t_labels_tEqualText = TRUE,
-                            t_labels_removeEndPoints = TRUE) {
+config_for_plot_func = function(plotting_option = 2, # 1 with legend / 2 without legend / 3 blank theme
+                                trail = "fade", # "solid", "fade" or integer
+                                kind_of_palette = "first_red",
+                                xlab = "Position x",
+                                ylab = "Position y",
+                                main_title = NULL,
+                                legend_title = "Particle",
+                                heads_alpha = 1, # full color
+                                heads_shape = 19, # filled point
+                                tails_alpha = 0.3,
+                                tails_shape = 1, # circled point
+                                t_labels = TRUE,
+                                t_labels_nbMax = 5,
+                                t_labels_prettyNumDigits = 2,
+                                t_labels_size = 2.5,
+                                t_labels_tEqualText = TRUE,
+                                t_labels_removeEndPoints = TRUE) {
   list(plotting_option = plotting_option,
        trail = trail,
        kind_of_palette = kind_of_palette,
@@ -111,25 +111,25 @@ plot_config_func = function(plotting_option = 2, # 1 with legend / 2 without leg
 
 ## Generic path plotting
 generic_path_plot = function(df_plot_list,
-                             plot_config = plot_config_func()) {
+                             config_for_plot = config_for_plot_func()) {
   ## Attaching variables
-  plotting_option = plot_config$plotting_option
-  trail = plot_config$trail
-  kind_of_palette = plot_config$kind_of_palette
-  xlab = plot_config$xlab
-  ylab = plot_config$ylab
-  main_title = plot_config$main_title
-  legend_title = plot_config$legend_title
-  heads_alpha = plot_config$heads_alpha
-  heads_shape = plot_config$heads_shape
-  tails_alpha = plot_config$tails_alpha
-  tails_shape = plot_config$tails_shape
-  t_labels = plot_config$t_labels
-  t_labels_nbMax = plot_config$t_labels_nbMax
-  t_labels_prettyNumDigits = plot_config$t_labels_prettyNumDigits
-  t_labels_size = plot_config$t_labels_size
-  t_labels_tEqualText = plot_config$t_labels_tEqualText
-  t_labels_removeEndPoints = plot_config$t_labels_removeEndPoints
+  plotting_option = config_for_plot$plotting_option
+  trail = config_for_plot$trail
+  kind_of_palette = config_for_plot$kind_of_palette
+  xlab = config_for_plot$xlab
+  ylab = config_for_plot$ylab
+  main_title = config_for_plot$main_title
+  legend_title = config_for_plot$legend_title
+  heads_alpha = config_for_plot$heads_alpha
+  heads_shape = config_for_plot$heads_shape
+  tails_alpha = config_for_plot$tails_alpha
+  tails_shape = config_for_plot$tails_shape
+  t_labels = config_for_plot$t_labels
+  t_labels_nbMax = config_for_plot$t_labels_nbMax
+  t_labels_prettyNumDigits = config_for_plot$t_labels_prettyNumDigits
+  t_labels_size = config_for_plot$t_labels_size
+  t_labels_tEqualText = config_for_plot$t_labels_tEqualText
+  t_labels_removeEndPoints = config_for_plot$t_labels_removeEndPoints
 
   ## Color palette
   nb_part = length(df_plot_list)
@@ -155,21 +155,21 @@ generic_path_plot = function(df_plot_list,
 
   # Combine list elements
   df_plot = dplyr::bind_rows(df_plot_list, .id = "id") %>%
-    dplyr::rename(points = id) %>%
-    dplyr::mutate(points = factor(points))
+    dplyr::rename(points = .data$id) %>%
+    dplyr::mutate(points = factor(.data$points))
 
-  df_heads_tails = df_plot %>% dplyr::select(points, t, pos_x, pos_y)
-  df_heads_tails = na.omit(df_heads_tails)
+  df_heads_tails = df_plot %>% dplyr::select(.data$points, .data$t, .data$pos_x, .data$pos_y)
+  df_heads_tails = stats::na.omit(df_heads_tails)
 
   df_tails = df_heads_tails %>%
-    dplyr::group_by(points) %>%
-    dplyr::arrange(t) %>%
-    dplyr::summarise(t = t[1], pos_x = pos_x[1], pos_y = pos_y[1])
+    dplyr::group_by(.data$points) %>%
+    dplyr::arrange(.data$t) %>%
+    dplyr::summarise(t = .data$t[1], pos_x = .data$pos_x[1], pos_y = .data$pos_y[1])
 
   df_heads = df_heads_tails %>%
-    dplyr::group_by(points) %>%
-    dplyr::arrange(-t) %>%
-    dplyr::summarise(t = t[1], pos_x = pos_x[1], pos_y = pos_y[1])
+    dplyr::group_by(.data$points) %>%
+    dplyr::arrange(-.data$t) %>%
+    dplyr::summarise(t = .data$t[1], pos_x = .data$pos_x[1], pos_y = .data$pos_y[1])
 
   # Adding alpha
   alpha_func = get_alpha_func(trail)
@@ -179,7 +179,7 @@ generic_path_plot = function(df_plot_list,
   df_heads$alpha = heads_alpha
 
   ## Plotting
-  p = ggplot2::ggplot(df_plot, ggplot2::aes(x = pos_x, y = pos_y, color = points, alpha = alpha, label = t_labels)) +
+  p = ggplot2::ggplot(df_plot, ggplot2::aes(x = .data$pos_x, y = .data$pos_y, color = .data$points, alpha = .data$alpha, label = t_labels)) +
     ggplot2::geom_path(na.rm = TRUE) + ggplot2::guides(alpha=FALSE) +
     ggplot2::xlab(xlab) + ggplot2::ylab(ylab) + ggplot2::labs(color = legend_title, title = main_title)
 
@@ -245,9 +245,14 @@ generic_path_plot = function(df_plot_list,
   return(df_plot_list)
 }
 
+## Choices for pos_x or pos_y
+pos_xy_choices = function() {
+  return(c("time", "velocity", "acceleration", "dim1", "dist1"))
+}
+
 ## Plot of scent from a summary
 plot_scent = function(x = "velocity", y = "acceleration", summary,
-                      plot_config = plot_config_func()) {
+                      config_for_plot = config_for_plot_func()) {
   t = seq(from = 0, to = summary$Tmax, length.out = summary$N)
   nb_part = dim(summary$Evolution)[1]
   inputs = list(x = x, y = y)
@@ -257,17 +262,17 @@ plot_scent = function(x = "velocity", y = "acceleration", summary,
   ## Change labels xlab/ylab
   for(val in c("x", "y")) {
     if(inputs[[val]] == "velocity") {
-      plot_config[[lab_name[[val]]]] = "Velocity"
+      config_for_plot[[lab_name[[val]]]] = "Velocity"
     } else if(inputs[[val]] == "acceleration") {
-      plot_config[[lab_name[[val]]]] = "Acceleration"
+      config_for_plot[[lab_name[[val]]]] = "Acceleration"
     } else if(inputs[[val]] == "time") {
-      plot_config[[lab_name[[val]]]] = "Time"
+      config_for_plot[[lab_name[[val]]]] = "Time"
     } else if(grepl("dim", inputs[[val]])) {
       val_number = as.numeric(gsub("dim", "", inputs[[val]], fixed = TRUE))
-      plot_config[[lab_name[[val]]]] = paste0("Dimension ", val_number)
+      config_for_plot[[lab_name[[val]]]] = paste0("Dimension ", val_number)
     } else if(grepl("dist", inputs[[val]])) {
       val_number = as.numeric(gsub("dist", "", inputs[[val]], fixed = TRUE))
-      plot_config[[lab_name[[val]]]] = paste0("Distance to particle ", val_number[1])
+      config_for_plot[[lab_name[[val]]]] = paste0("Distance to particle ", val_number[1])
     }
   }
 
@@ -292,7 +297,7 @@ plot_scent = function(x = "velocity", y = "acceleration", summary,
     df_plot_list[[i]] = data.frame(t = t, pos_x = pos[["x"]][,i], pos_y = pos[["y"]][,i])
   }
 
-  generic_path_plot(df_plot_list, plot_config)
+  generic_path_plot(df_plot_list, config_for_plot)
 }
 
 ## Adding a circle
@@ -306,7 +311,7 @@ geom_circle = function(center = c(0,0), radius = 1,
   xx <- center[1] + radius * cos(tt)
   yy <- center[2] + radius * sin(tt)
   my_circle = data.frame(x = xx, y = yy)
-  p_add = ggplot2::geom_path(mapping = ggplot2::aes(x, y),
+  p_add = ggplot2::geom_path(mapping = ggplot2::aes(.data$x, .data$y),
                              linetype = linetype, color = color, alpha = alpha,
                              data = my_circle, inherit.aes = FALSE)
   return(p_add)

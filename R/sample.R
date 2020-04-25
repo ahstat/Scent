@@ -34,49 +34,15 @@ rspin = function(n_elem, nb_on_circle = 2) {
   return(out)
 }
 
-## Combination of elements with loop over all types and densitypes
-combin = function(n_elem, types = c("type", "densitype"), nb_on_circle = 2) {
-  combin_types = function(n_elem, nb_on_circle, stop_overflow = 1e6) {
-    if(nb_on_circle^n_elem > stop_overflow) {
-      stop("Too many combinations to list")
-    }
-    unitype = circle_elements(nb_on_circle)
-    out = expand.grid(rep(list(unitype), n_elem))
-    return(out)
+combin = function(n_elem, nb_on_circle = 2, stop_overflow = 1e6) {
+  if(nb_on_circle^n_elem > stop_overflow) {
+    stop("Too many combinations to list")
   }
-
-  if(length(types) == 2) {
-    vectypes = combin_types(2*n_elem, nb_on_circle)
-    colnames(vectypes) = apply(expand.grid(c("type", "densitype"), 1:n_elem), 1, paste, collapse = "")
-  } else if(length(types) == 1) {
-    if(types == "type") {
-      densitypes = rep(+1, n_elem)
-      vectypes = combin_types(n_elem, nb_on_circle)
-      colnames(vectypes) = apply(expand.grid(c("type"), 1:n_elem), 1, paste, collapse = "")
-      for(i in 1:n_elem) {
-        vectypes[[paste0("densitype", i)]] = densitypes[i]
-      }
-      # reorder
-      my_order = apply(expand.grid(c(0, n_elem), 1:n_elem), 1, sum)
-      vectypes = vectypes[,my_order]
-    } else if(types == "densitype") {
-      types = rep(+1, n_elem)
-      vectypes = combin_types(n_elem, nb_on_circle)
-      colnames(vectypes) = apply(expand.grid(c("densitype"), 1:n_elem), 1, paste, collapse = "")
-      for(i in 1:n_elem) {
-        vectypes[[paste0("type", i)]] = types[i]
-      }
-      # reorder
-      my_order = apply(expand.grid(c(n_elem, 0), 1:n_elem), 1, sum)
-      vectypes = vectypes[,my_order]
-    } else {
-      stop("If length(types) == 1, only 'type' and 'densitype' is possible")
-    }
-  } else {
-    stop("length(types) must be of length 1 or 2")
-  }
-  colnames(vectypes) = gsub(" ", "", colnames(vectypes)) # for n_elem >= 10
-  return(vectypes)
+  unitype = circle_elements(nb_on_circle)
+  out = expand.grid(rep(list(unitype), n_elem))
+  out = as.list(as.data.frame(t(out)))
+  names(out) = NULL
+  return(out)
 }
 
 ##################################
@@ -179,6 +145,6 @@ icositetrachore_on_S3 = function() {
   my_matrix[23,] = c( 0,  1,  0, -1)
   my_matrix[24,] = c( 0,  1,  0,  1)
 
-  my_matrix = t(apply(my_matrix, 1, scent:::.normalize_me_on_S))
+  my_matrix = t(apply(my_matrix, 1, .normalize_me_on_S))
   return(my_matrix)
 }

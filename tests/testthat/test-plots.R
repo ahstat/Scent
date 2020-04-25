@@ -18,26 +18,26 @@ test_that("generic_palette returns a palette of colors of correct size", {
   }
 })
 
-test_that("plot_config_func returns a list with the correct elements", {
-  plot_config = plot_config_func()
-  expect_equal(length(plot_config), 17)
-  expect_true("plotting_option" %in% names(plot_config))
-  expect_true("trail" %in% names(plot_config))
-  expect_true("kind_of_palette" %in% names(plot_config))
-  expect_true("xlab" %in% names(plot_config))
-  expect_true("ylab" %in% names(plot_config))
-  expect_true("main_title" %in% names(plot_config))
-  expect_true("legend_title" %in% names(plot_config))
-  expect_true("heads_alpha" %in% names(plot_config))
-  expect_true("heads_shape" %in% names(plot_config))
-  expect_true("tails_alpha" %in% names(plot_config))
-  expect_true("tails_shape" %in% names(plot_config))
-  expect_true("t_labels" %in% names(plot_config))
-  expect_true("t_labels_nbMax" %in% names(plot_config))
-  expect_true("t_labels_prettyNumDigits" %in% names(plot_config))
-  expect_true("t_labels_size" %in% names(plot_config))
-  expect_true("t_labels_tEqualText" %in% names(plot_config))
-  expect_true("t_labels_removeEndPoints" %in% names(plot_config))
+test_that("config_for_plot_func returns a list with the correct elements", {
+  config_for_plot = config_for_plot_func()
+  expect_equal(length(config_for_plot), 17)
+  expect_true("plotting_option" %in% names(config_for_plot))
+  expect_true("trail" %in% names(config_for_plot))
+  expect_true("kind_of_palette" %in% names(config_for_plot))
+  expect_true("xlab" %in% names(config_for_plot))
+  expect_true("ylab" %in% names(config_for_plot))
+  expect_true("main_title" %in% names(config_for_plot))
+  expect_true("legend_title" %in% names(config_for_plot))
+  expect_true("heads_alpha" %in% names(config_for_plot))
+  expect_true("heads_shape" %in% names(config_for_plot))
+  expect_true("tails_alpha" %in% names(config_for_plot))
+  expect_true("tails_shape" %in% names(config_for_plot))
+  expect_true("t_labels" %in% names(config_for_plot))
+  expect_true("t_labels_nbMax" %in% names(config_for_plot))
+  expect_true("t_labels_prettyNumDigits" %in% names(config_for_plot))
+  expect_true("t_labels_size" %in% names(config_for_plot))
+  expect_true("t_labels_tEqualText" %in% names(config_for_plot))
+  expect_true("t_labels_removeEndPoints" %in% names(config_for_plot))
 })
 
 test_that(".adding_text_legend correctly adds the time legend column", {
@@ -104,19 +104,19 @@ test_that("generic_path_plot does not throw error", {
   df_plot_list[["partic1"]] = df_plot1
   df_plot_list[["partic2"]] = df_plot2
 
-  plot_config = plot_config_func()
+  config_for_plot = config_for_plot_func()
 
-  plot_config$plotting_option = 1
-  plot_config$kind_of_palette = "first_red"
-  expect_error(generic_path_plot(df_plot_list, plot_config), NA)
+  config_for_plot$plotting_option = 1
+  config_for_plot$kind_of_palette = "first_red"
+  expect_error(generic_path_plot(df_plot_list, config_for_plot), NA)
 
-  plot_config$plotting_option = 2
-  plot_config$kind_of_palette = "default"
-  expect_error(generic_path_plot(df_plot_list, plot_config), NA)
+  config_for_plot$plotting_option = 2
+  config_for_plot$kind_of_palette = "default"
+  expect_error(generic_path_plot(df_plot_list, config_for_plot), NA)
 
-  plot_config$plotting_option = 3
-  plot_config$kind_of_palette = "blind"
-  expect_error(generic_path_plot(df_plot_list, plot_config), NA)
+  config_for_plot$plotting_option = 3
+  config_for_plot$kind_of_palette = "blind"
+  expect_error(generic_path_plot(df_plot_list, config_for_plot), NA)
 })
 
 test_that("plot_scent does not throw error", {
@@ -132,28 +132,28 @@ test_that("plot_scent does not throw error", {
   summary = summary_func(Evolution, manifold, alpha)
 
   p1 = plot_scent(x = "velocity", y = "acceleration", summary,
-                  plot_config_func(plotting_option = 1,
-                                   t_labels = FALSE,
-                                   kind_of_palette = "default"))
+                  config_for_plot_func(plotting_option = 1,
+                                       t_labels = FALSE,
+                                       kind_of_palette = "default"))
   expect_error(p1, NA)
 
   p2 = plot_scent(x = "time", y = "velocity", summary,
-                  plot_config_func(plotting_option = 1, t_labels = TRUE, kind_of_palette = "default"))
+                  config_for_plot_func(plotting_option = 1, t_labels = TRUE, kind_of_palette = "default"))
   expect_error(p2, NA) # > 0.5 each
 
   p3 = plot_scent(x = "time", y = "acceleration", summary,
-                  plot_config_func(plotting_option = 1, t_labels = TRUE, kind_of_palette = "default"))
+                  config_for_plot_func(plotting_option = 1, t_labels = TRUE, kind_of_palette = "default"))
   expect_error(p3, NA)
 
   p4 = plot_scent(x = "dim1", y = "dim2", summary,
-                  plot_config_func(plotting_option = 1, t_labels = TRUE))
+                  config_for_plot_func(plotting_option = 1, t_labels = TRUE))
   expect_error(p4, NA)
 
   p4_with_circle = p4 + geom_circle() + ggplot2::coord_equal()
   expect_error(p4_with_circle, NA)
 
   p5 = plot_scent(x = "dist1", y = "dist2", summary,
-                  plot_config_func(plotting_option = 1, t_labels = TRUE))
+                  config_for_plot_func(plotting_option = 1, t_labels = TRUE))
   expect_error(p5, NA)
 })
 
@@ -168,6 +168,7 @@ test_that("plot_scent does not throw error (some additional plots)", {
   manifold = "E"
   alpha = 0.1
   N = 100
+  g = g_sin
 
   for(test_id in c(1, 2)) {
     if(test_id == 1) {
@@ -183,10 +184,10 @@ test_that("plot_scent does not throw error (some additional plots)", {
 
     Evolution = get_evol(N, my_matrix, g, densitypes, types, alpha, manifold)
     summary = summary_func(Evolution, manifold, alpha)
-    p6[[test_id]][[1]] = plot_scent("dim1", "dim2", summary, plot_config = plot_config_func()) +
+    p6[[test_id]][[1]] = plot_scent("dim1", "dim2", summary, config_for_plot = config_for_plot_func()) +
       geom_circle() + ggplot2::coord_equal() +
       ggplot2::ggtitle(paste0("types ", types_name, " and densitypes ", densitypes_name))
-    p6[[test_id]][[2]] = plot_scent("dist1", "dist2", summary, plot_config = plot_config_func()) +
+    p6[[test_id]][[2]] = plot_scent("dist1", "dist2", summary, config_for_plot = config_for_plot_func()) +
       ggplot2::coord_equal() +
       ggplot2::ggtitle(paste0("types ", types_name, " and densitypes ", densitypes_name))
   }
@@ -210,12 +211,12 @@ test_that("plot_scent does not throw error (some additional plots)", {
 
   Evolution = get_evol(N, my_matrix, g, densitypes, types, alpha, manifold)
   summary = summary_func(Evolution, manifold, alpha)
-  plot_config = plot_config_func(plotting_option = 1, kind_of_palette = "default", trail = 500)
-  p7[[1]] = plot_scent("dim1", "dim2", summary, plot_config = plot_config) +
+  config_for_plot = config_for_plot_func(plotting_option = 1, kind_of_palette = "default", trail = 500)
+  p7[[1]] = plot_scent("dim1", "dim2", summary, config_for_plot = config_for_plot) +
     geom_circle() + ggplot2::coord_equal()
-  p7[[2]] = plot_scent("dist1", "dist3", summary, plot_config = plot_config) +
+  p7[[2]] = plot_scent("dist1", "dist3", summary, config_for_plot = config_for_plot) +
     ggplot2::coord_equal()
-  p7[[3]] = plot_scent("velocity", "acceleration", summary, plot_config = plot_config) +
+  p7[[3]] = plot_scent("velocity", "acceleration", summary, config_for_plot = config_for_plot) +
     ggplot2::coord_equal()
 
   expect_error(p7[[1]], NA)
